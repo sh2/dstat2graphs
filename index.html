@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>dstat2graphs</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <style type="text/css">
+      body {
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+      .hero-unit {
+        padding: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="hero-unit">
+        <h1>dstat2graphs</h1>
+        <p>It works only for 'dstat -tvfn --output log.csv 1'.</p>
+      </div>
+      <form action="dstat2graphs.php" method="post" enctype="multipart/form-data" class="form-horizontal">
+        <div class="control-group">
+          <label class="control-label">CSV File</label>
+          <div class="controls">
+            <input type="hidden" name="MAX_FILE_SIZE" value="4194304" />
+            <input type="file" name="csv_file" size="50" class="validate-file" />
+            <span class="help-inline"></span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Width</label>
+          <div class="controls">
+            <input type="text" name="width" value="512" class="span1 validate-size" />
+            <span class="help-inline"></span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Height</label>
+          <div class="controls">
+            <input type="text" name="height" value="192" class="span1 validate-size" />
+            <span class="help-inline"></span>
+          </div>
+        </div>
+        <div id="disk" class="control-group">
+          <label class="control-label">Disk I/O upper limit</label>
+          <div class="controls">
+            <input type="text" name="disk_limit" value="0" class="span2 validate-limit" /> (Bytes/sec)
+            <span class="help-inline"></span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Network I/O upper limit</label>
+          <div class="controls">
+            <input type="text" name="net_limit" value="0" class="span2 validate-limit" /> (Bytes/sec)
+            <span class="help-inline"></span>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <input type="submit" value="Upload" class="btn" />
+          </div>
+        </div>
+      </form>
+      <hr />
+      <div class="footer">
+        (c) 2012, Sadao Hiratsuka.
+      </div>
+    </div>
+    <script src="js/jquery-1.7.2.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+      $(function() {
+        $(window).unload(function() {});
+        $(':submit').removeAttr('disabled');
+        
+        $('form').submit(function() {
+          var isValid = true;
+          
+          $('input').each(function() {
+            var value = $(this).val();
+            var control = $(this).closest('.control-group');
+            var help = $(this).next('.help-inline');
+            
+            control.removeClass('error');
+            help.text('');
+            
+            if ($(this).hasClass('validate-file')) {
+              if (value == '') {
+                control.addClass('error');
+                help.text('Please select a file.');
+                isValid = false;
+              }
+            } else if ($(this).hasClass('validate-size')) {
+              if (!value.match(/^-?\d+$/) || (value < 64) || (1024 < value)) {
+                control.addClass('error');
+                help.text('Please enter a value between 64 and 1024.');
+                isValid = false;
+              }
+            } else if ($(this).hasClass('validate-limit')) {
+              if (!value.match(/^-?\d+$/) || (value < 0)) {
+                control.addClass('error');
+                help.text('Please enter a value greater than or equal to 0.');
+                isValid = false;
+              }
+            }
+          });
+          
+          if (isValid) {
+            $(':submit').attr('disabled', 'disabled');
+          }
+          
+          return isValid;
+        });
+      });
+    </script>
+  </body>
+</html>
