@@ -1,45 +1,46 @@
 dstat2graphs
 ============
 
-dstat‚ÌCSVƒƒOƒtƒ@ƒCƒ‹‚ðƒOƒ‰ƒt‚É•ÏŠ·‚µ‚Ü‚·B
+dstatã®CSVãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚°ãƒ©ãƒ•ã«å¤‰æ›ã—ã¾ã™ã€‚
+test
 
-ƒZƒbƒgƒAƒbƒv
+ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
 ------------
 
-Red Hat Enterprise Linux 5A6‚ÆA
-‚»‚ê‚ç‚ÌƒNƒ[ƒ“ƒfƒBƒXƒgƒŠƒrƒ…[ƒVƒ‡ƒ“‚ð‘ÎÛ‚É‚µ‚Ä‚¢‚Ü‚·B
+Red Hat Enterprise Linux 5ã€6ã¨ã€
+ãã‚Œã‚‰ã®ã‚¯ãƒ­ãƒ¼ãƒ³ãƒ‡ã‚£ã‚¹ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å¯¾è±¡ã«ã—ã¦ã„ã¾ã™ã€‚
 
-RRDtool‚ÆPerl‚ÌRRDsƒ‚ƒWƒ…[ƒ‹‚ª•K—v‚Å‚·‚Ì‚ÅA
-Red Hat Enterprise Linux 6‚Å‚ÍˆÈ‰º‚Ì‚æ‚¤‚É‚µ‚ÄƒCƒ“ƒXƒg[ƒ‹‚µ‚Ä‚­‚¾‚³‚¢B
-Red Hat Enterprise Linux 5‚Ìê‡‚ÍEPELƒŠƒ|ƒWƒgƒŠ‚©‚ç“üŽè‚µ‚Ä‚­‚¾‚³‚¢B
+RRDtoolã¨Perlã®RRDsãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ãŒå¿…è¦ã§ã™ã®ã§ã€
+Red Hat Enterprise Linux 6ã§ã¯ä»¥ä¸‹ã®ã‚ˆã†ã«ã—ã¦ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¦ãã ã•ã„ã€‚
+Red Hat Enterprise Linux 5ã®å ´åˆã¯EPELãƒªãƒã‚¸ãƒˆãƒªã‹ã‚‰å…¥æ‰‹ã—ã¦ãã ã•ã„ã€‚
 
     # yum install rrdtool rrdtool-perl
 
-–{ƒc[ƒ‹‚Íì‹ÆƒfƒBƒŒƒNƒgƒŠ‚Æ‚µ‚Ä/dev/shm‚ð—˜—p‚µ‚Ü‚·B
-ˆÈ‰º‚Ì‚æ‚¤‚É‚µ‚Äì‹ÆƒfƒBƒŒƒNƒgƒŠ‚ðì¬‚µ‚Ä‚­‚¾‚³‚¢B
-–{ƒc[ƒ‹‚ðP‹v“I‚ÉŽg—p‚·‚éê‡‚ÍA/etc/rc.local‚É
-ì‹ÆƒfƒBƒŒƒNƒgƒŠì¬ˆ—‚ð‹LÚ‚·‚é‚È‚Ç‚µ‚Ä‚­‚¾‚³‚¢B
+æœ¬ãƒ„ãƒ¼ãƒ«ã¯ä½œæ¥­ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã¨ã—ã¦/dev/shmã‚’åˆ©ç”¨ã—ã¾ã™ã€‚
+ä»¥ä¸‹ã®ã‚ˆã†ã«ã—ã¦ä½œæ¥­ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ä½œæˆã—ã¦ãã ã•ã„ã€‚
+æœ¬ãƒ„ãƒ¼ãƒ«ã‚’æ’ä¹…çš„ã«ä½¿ç”¨ã™ã‚‹å ´åˆã¯ã€/etc/rc.localã«
+ä½œæ¥­ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªä½œæˆå‡¦ç†ã‚’è¨˜è¼‰ã™ã‚‹ãªã©ã—ã¦ãã ã•ã„ã€‚
 
     # mkdir /dev/shm/dstat2graphs
     # chown apache:apache /dev/shm/dstat2graphs
 
-Apache‚ÌƒhƒLƒ…ƒƒ“ƒgƒ‹[ƒg”z‰º‚ÉƒXƒNƒŠƒvƒg‚ð”z’u‚µ‚Ä‚­‚¾‚³‚¢B
-ƒXƒNƒŠƒvƒg‚ð”z’u‚µ‚½ƒfƒBƒŒƒNƒgƒŠ‚Ì’¼‰º‚ÉreportsƒfƒBƒŒƒNƒgƒŠ‚ðì¬‚µA
-apacheƒ†[ƒU‚ª‘‚«ž‚Ý‚ðs‚¦‚éó‘Ô‚É‚µ‚Ä‚­‚¾‚³‚¢B
+Apacheã®ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆãƒ«ãƒ¼ãƒˆé…ä¸‹ã«ã‚¹ã‚¯ãƒªãƒ—ãƒˆã‚’é…ç½®ã—ã¦ãã ã•ã„ã€‚
+ã‚¹ã‚¯ãƒªãƒ—ãƒˆã‚’é…ç½®ã—ãŸãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®ç›´ä¸‹ã«reportsãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ä½œæˆã—ã€
+apacheãƒ¦ãƒ¼ã‚¶ãŒæ›¸ãè¾¼ã¿ã‚’è¡Œãˆã‚‹çŠ¶æ…‹ã«ã—ã¦ãã ã•ã„ã€‚
 
     # mkdir <document_root>/<script_dir>/reports
     # chmod 777 <document_root>/<script_dir>/reports
 
-ƒXƒNƒŠƒvƒg‚ð”z’u‚µ‚½ƒfƒBƒŒƒNƒgƒŠ’¼‰ºA
-‚¨‚æ‚ÑreportsƒfƒBƒŒƒNƒgƒŠ’¼‰º‚ÉcssAimgAjs‚ÌŠeƒfƒBƒŒƒNƒgƒŠ‚ðì¬‚µA
-jQuery‚ÆTwitter Bootstrap‚ð”z’u‚µ‚Ä‚­‚¾‚³‚¢B
+ã‚¹ã‚¯ãƒªãƒ—ãƒˆã‚’é…ç½®ã—ãŸãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªç›´ä¸‹ã€
+ãŠã‚ˆã³reportsãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªç›´ä¸‹ã«cssã€imgã€jsã®å„ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ä½œæˆã—ã€
+jQueryã¨Twitter Bootstrapã‚’é…ç½®ã—ã¦ãã ã•ã„ã€‚
 
-ƒEƒFƒu‰æ–Ê‚©‚ç‚ÌŽg‚¢•û
+ã‚¦ã‚§ãƒ–ç”»é¢ã‹ã‚‰ã®ä½¿ã„æ–¹
 ----------------------
 
-(‚ ‚Æ‚Å)
+(ã‚ã¨ã§)
 
-PerlƒXƒNƒŠƒvƒg’P‘Ì‚Å‚ÌŽg‚¢•û
+Perlã‚¹ã‚¯ãƒªãƒ—ãƒˆå˜ä½“ã§ã®ä½¿ã„æ–¹
 ----------------------------
 
-(‚ ‚Æ‚Å)
+(ã‚ã¨ã§)
