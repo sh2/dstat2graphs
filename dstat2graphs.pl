@@ -60,7 +60,6 @@ sub load_csv {
         } elsif ($line =~ /^"?[a-zA-Z]/) {
             # Header
             my @cols = parse_line(',', 0, $line);
-            print STDERR "$cols[0]\n";
             
             if ($cols[0] =~ /^Dstat/) {
                 # Title
