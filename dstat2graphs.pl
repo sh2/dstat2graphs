@@ -60,8 +60,13 @@ sub load_csv {
         } elsif ($line =~ /^"?[a-zA-Z]/) {
             # Header
             my @cols = parse_line(',', 0, $line);
+            print STDERR "$cols[0]\n";
             
-            if ($cols[0] eq 'Host:') {
+            if ($cols[0] =~ /^Dstat/) {
+                # Title
+            } elsif ($cols[0] eq 'Author:') {
+                # Author, URL
+            } elsif ($cols[0] eq 'Host:') {
                 # Host, User
                 $hostname = $cols[1];
             } elsif ($cols[0] eq 'Cmdline:') {
