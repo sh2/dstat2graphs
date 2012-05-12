@@ -567,7 +567,7 @@ sub create_graph {
     }
     
     push @options, '--title';
-    push @options, 'Paging (Pages/sec)';
+    push @options, 'Paging (Bytes/sec)';
     
     push @options, "DEF:IN=${rrd_file}:PAGE_IN:AVERAGE";
     push @options, "LINE1:IN#${colors[0]}:page_in";
