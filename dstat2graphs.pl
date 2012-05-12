@@ -897,15 +897,15 @@ _EOF_
           <p><img src="procs_blk.png" alt="Processes blocked" /></p>
           <h3 id="procs_new">Processes new</h3>
           <p><img src="procs_new.png" alt="Processes new" /></p>
-          <hr>
+          <hr />
           <h2>Memory Usage</h2>
           <h3 id="memory">Memory Usage</h3>
           <p><img src="memory.png" alt="Memory Usage" /></p>
-          <hr>
+          <hr />
           <h2>Paging</h2>
           <h3 id="paging">Paging</h3>
           <p><img src="paging.png" alt="Paging" /></p>
-          <hr>
+          <hr />
           <h2>Disk I/O</h2>
           <h3 id="disk">Disk I/O total</h3>
           <p><img src="disk.png" alt="Disk I/O total" /></p>
@@ -919,13 +919,13 @@ _EOF_
     }
     
     print $fh <<_EOF_;
-          <hr>
+          <hr />
           <h2>System</h2>
           <h3 id="interrupts">Interrupts</h3>
           <p><img src="interrupts.png" alt="Interrupts" /></p>
           <h3 id="cswitches">Context Switches</h3>
           <p><img src="cswitches.png" alt="Context Switches" /></p>
-          <hr>
+          <hr />
           <h2>CPU Usage</h2>
           <h3 id="cpu">CPU Usage total</h3>
           <p><img src="cpu.png" alt="CPU Usage total" /></p>
@@ -939,7 +939,7 @@ _EOF_
     }
     
     print $fh <<_EOF_;
-          <hr>
+          <hr />
           <h2>Network I/O</h2>
           <h3 id="net">Network I/O total</h3>
           <p><img src="net.png" alt="Network I/O total" /></p>
