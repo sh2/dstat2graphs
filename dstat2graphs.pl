@@ -469,7 +469,12 @@ sub create_graph {
     @options = @template;
     
     push @options, '--upper-limit';
-    push @options, $procs_max;
+    
+    if ($procs_max < 10) {
+        push @options, 10;
+    } else {
+        push @options, $procs_max;
+    }
     
     push @options, '--title';
     push @options, 'Processes running';
@@ -491,7 +496,12 @@ sub create_graph {
     @options = @template;
     
     push @options, '--upper-limit';
-    push @options, $procs_max;
+    
+    if ($procs_max < 10) {
+        push @options, 10;
+    } else {
+        push @options, $procs_max;
+    }
     
     push @options, '--title';
     push @options, 'Processes blocked';
@@ -513,7 +523,12 @@ sub create_graph {
     @options = @template;
     
     push @options, '--upper-limit';
-    push @options, $procs_new_max;
+    
+    if ($procs_new_max < 10) {
+        push @options, 10;
+    } else {
+        push @options, $procs_new_max;
+    }
     
     push @options, '--title';
     push @options, 'Processes new';
@@ -535,7 +550,12 @@ sub create_graph {
     @options = @template;
     
     push @options, '--upper-limit';
-    push @options, $memory_max;
+    
+    if ($memory_max < 10) {
+        push @options, 10;
+    } else {
+        push @options, $memory_max;
+    }
     
     push @options, '--base';
     push @options, 1024;
@@ -596,6 +616,8 @@ sub create_graph {
     
     if ($disk_limit != 0) {
         push @options, $disk_limit;
+    } elsif ($disk_max < 10) {
+        push @options, 10;
     } else {
         push @options, $disk_max;
     }
@@ -627,6 +649,8 @@ sub create_graph {
         
         if ($disk_limit != 0) {
             push @options, $disk_limit;
+        } elsif ($disk_max < 10) {
+            push @options, 10;
         } else {
             push @options, $disk_max;
         }
@@ -655,7 +679,12 @@ sub create_graph {
     @options = @template;
     
     push @options, '--upper-limit';
-    push @options, $interrupts_max;
+    
+    if ($interrupts_max < 10) {
+        push @options, 10;
+    } else {
+        push @options, $interrupts_max;
+    }
     
     push @options, '--title';
     push @options, 'Interrupts (/sec)';
@@ -674,7 +703,12 @@ sub create_graph {
     @options = @template;
     
     push @options, '--upper-limit';
-    push @options, $cswitches_max;
+    
+    if ($cswitches_max < 10) {
+        push @options, 10;
+    } else {
+        push @options, $cswitches_max;
+    }
     
     push @options, '--title';
     push @options, 'Context Switches (/sec)';
@@ -760,6 +794,8 @@ sub create_graph {
     
     if ($net_limit != 0) {
         push @options, $net_limit;
+    } elsif ($net_max < 10) {
+        push @options, 10;
     } else {
         push @options, $net_max;
     }
@@ -791,6 +827,8 @@ sub create_graph {
         
         if ($net_limit != 0) {
             push @options, $net_limit;
+        } elsif ($net_max < 10) {
+            push @options, 10;
         } else {
             push @options, $net_max;
         }
