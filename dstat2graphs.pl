@@ -439,6 +439,7 @@ sub create_dir {
     };
     
     if ($@) {
+        &delete_rrd();
         die $@;
     }
 }
