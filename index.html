@@ -66,7 +66,8 @@
           </div>
           <div class="control-group">
             <div class="controls">
-              <input type="submit" value="Upload" class="btn" />
+              <input type="submit" value="Upload" class="btn span3" />
+              <input type="reset" value="Reset" class="btn span2" />
             </div>
           </div>
         </fieldset>
@@ -82,6 +83,7 @@
       $(function() {
         $(window).unload(function() {});
         $(':submit').removeAttr('disabled');
+        $(':reset').removeAttr('disabled');
         
         $('form').submit(function() {
           var isValid = true;
@@ -117,9 +119,15 @@
           
           if (isValid) {
             $(':submit').attr('disabled', 'disabled');
+            $(':reset').attr('disabled', 'disabled');
           }
           
           return isValid;
+        });
+        
+        $(':reset').click(function() {
+          $('.control-group').removeClass('error');
+          $('.help-inline').text('');
         });
       });
     </script>
