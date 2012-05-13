@@ -20,47 +20,56 @@
         <p>It works only for 'dstat -tvfn --output log.csv 1'.</p>
       </div>
       <form action="dstat2graphs.php" method="post" enctype="multipart/form-data" class="form-horizontal">
-        <div class="control-group">
-          <label class="control-label">CSV File</label>
-          <div class="controls">
-            <!-- <input type="hidden" name="MAX_FILE_SIZE" value="4194304" /> -->
-            <input type="file" name="csv_file" size="50" class="validate-file" />
-            <span class="help-inline"></span>
+        <fieldset>
+          <legend>CSV File</legend>
+          <div class="control-group">
+            <label class="control-label">CSV File</label>
+            <div class="controls">
+              <!-- <input type="hidden" name="MAX_FILE_SIZE" value="4194304" /> -->
+              <input type="file" name="csv_file" size="50" class="validate-file" />
+              <span class="help-inline"></span>
+            </div>
           </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label">Width</label>
-          <div class="controls">
-            <input type="text" name="width" value="512" class="span1 validate-size" />
-            <span class="help-inline"></span>
+        </fieldset>
+        <fieldset>
+          <legend>Graph Size</legend>
+          <div class="control-group">
+            <label class="control-label">Width</label>
+            <div class="controls">
+              <input type="text" name="width" value="512" class="span1 validate-size" />
+              <span class="help-inline"></span>
+            </div>
           </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label">Height</label>
-          <div class="controls">
-            <input type="text" name="height" value="192" class="span1 validate-size" />
-            <span class="help-inline"></span>
+          <div class="control-group">
+            <label class="control-label">Height</label>
+            <div class="controls">
+              <input type="text" name="height" value="192" class="span1 validate-size" />
+              <span class="help-inline"></span>
+            </div>
           </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label">Disk I/O upper limit</label>
-          <div class="controls">
-            <input type="text" name="disk_limit" value="0" class="span2 validate-limit" /> (Bytes/sec)
-            <span class="help-inline"></span>
+        </fieldset>
+        <fieldset>
+          <legend>Upper Limits</legend>
+          <div class="control-group">
+            <label class="control-label">Disk I/O</label>
+            <div class="controls">
+              <input type="text" name="disk_limit" value="0" class="span2 validate-limit" /> (Bytes/sec)
+              <span class="help-inline"></span>
+            </div>
           </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label">Network I/O upper limit</label>
-          <div class="controls">
-            <input type="text" name="net_limit" value="0" class="span2 validate-limit" /> (Bytes/sec)
-            <span class="help-inline"></span>
+          <div class="control-group">
+            <label class="control-label">Network I/O</label>
+            <div class="controls">
+              <input type="text" name="net_limit" value="0" class="span2 validate-limit" /> (Bytes/sec)
+              <span class="help-inline"></span>
+            </div>
           </div>
-        </div>
-        <div class="control-group">
-          <div class="controls">
-            <input type="submit" value="Upload" class="btn" />
+          <div class="control-group">
+            <div class="controls">
+              <input type="submit" value="Upload" class="btn" />
+            </div>
           </div>
-        </div>
+        </fieldset>
       </form>
       <hr />
       <div class="footer">
