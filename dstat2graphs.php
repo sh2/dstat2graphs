@@ -65,7 +65,7 @@ if (is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
   </head>
   <body>
     <p>
-<?php print $message; ?>
+<?php echo $message; ?>
     </p>
   </body>
 </html>
