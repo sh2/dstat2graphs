@@ -536,6 +536,9 @@ sub create_graph {
     push @options, '--upper-limit';
     push @options, $memory_max;
     
+    push @options, '--base';
+    push @options, 1024;
+    
     push @options, '--title';
     push @options, 'Memory Usage (Bytes)';
     
@@ -566,6 +569,9 @@ sub create_graph {
         push @options, $paging_max;
     }
     
+    push @options, '--base';
+    push @options, 1024;
+    
     push @options, '--title';
     push @options, 'Paging (Bytes/sec)';
     
@@ -592,6 +598,9 @@ sub create_graph {
     } else {
         push @options, $disk_max;
     }
+    
+    push @options, '--base';
+    push @options, 1024;
     
     push @options, '--title';
     push @options, 'Disk I/O total (Bytes/sec)';
@@ -620,6 +629,9 @@ sub create_graph {
         } else {
             push @options, $disk_max;
         }
+        
+        push @options, '--base';
+        push @options, 1024;
         
         push @options, '--title';
         push @options, "Disk I/O ${disk} (Bytes/sec)";
@@ -751,6 +763,9 @@ sub create_graph {
         push @options, $net_max;
     }
     
+    push @options, '--base';
+    push @options, 1024;
+    
     push @options, '--title';
     push @options, 'Network I/O total (Bytes/sec)';
     
@@ -778,6 +793,9 @@ sub create_graph {
         } else {
             push @options, $net_max;
         }
+        
+        push @options, '--base';
+        push @options, 1024;
         
         push @options, '--title';
         push @options, "Network I/O ${net} (Bytes/sec)";
