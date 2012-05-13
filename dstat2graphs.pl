@@ -5,9 +5,9 @@ use warnings;
 
 use File::Path;
 use HTML::Entities;
-use Time::Local;
-use Text::ParseWords;
 use RRDs;
+use Text::ParseWords;
+use Time::Local;
 
 if ($#ARGV != 5) {
     die 'Usage: perl dstat2graph.pl csv_file report_dir width height disk_limit net_limit';
