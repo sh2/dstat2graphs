@@ -37,9 +37,7 @@ my $top_dir = '..';
 my $rrd_file = '/dev/shm/dstat2graphs/' . &random_str() . '.rrd';
 
 my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net);
-my ($start_time, $end_time) = (0, 0);
-my ($procs_max, $procs_new_max, $memory_max, $paging_max) = (0, 0, 0, 0);
-my ($disk_max, $interrupts_max, $cswitches_max, $net_max) = (0, 0, 0, 0);
+my ($start_time, $end_time, $memory_size) = (0, 0, 0);
 
 &load_csv();
 &create_rrd();
@@ -140,73 +138,10 @@ sub load_csv {
             }
             
             $end_time = $unixtime;
-            
             push @data, $line;
             
-            # Find maximum values
-            # Processes
-            if ($procs_max < $cols[1]) {
-                $procs_max = $cols[1];
-            }
-            
-            if ($procs_max < $cols[2]) {
-                $procs_max = $cols[2];
-            }
-            
-            if ($procs_new_max < $cols[3]) {
-                $procs_new_max = $cols[3];
-            }
-            
-            # Memory
-            if ($memory_max < $cols[4] + $cols[5] + $cols[6] + $cols[7]) {
-                $memory_max = $cols[4] + $cols[5] + $cols[6] + $cols[7];
-            }
-            
-            # Paging
-            if ($paging_max < $cols[8]) {
-                $paging_max = $cols[8];
-            }
-            
-            if ($paging_max < $cols[9]) {
-                $paging_max = $cols[9];
-            }
-            
-            # Disk
-            foreach my $disk (keys %index_disk) {
-                $disk_read += $cols[$index_disk{$disk}];
-                $disk_writ += $cols[$index_disk{$disk} + 1];
-            }
-            
-            if ($disk_max < $disk_read) {
-                $disk_max = $disk_read;
-            }
-            
-            if ($disk_max < $disk_writ) {
-                $disk_max = $disk_writ;
-            }
-            
-            # Interrupts
-            if ($interrupts_max < $cols[$index_cpu{'0'} - 2]) {
-                $interrupts_max = $cols[$index_cpu{'0'} - 2];
-            }
-            
-            # Context Switches
-            if ($cswitches_max < $cols[$index_cpu{'0'} - 1]) {
-                $cswitches_max = $cols[$index_cpu{'0'} - 1];
-            }
-            
-            foreach my $net (keys %index_net) {
-                $net_recv += $cols[$index_net{$net}];
-                $net_send += $cols[$index_net{$net} + 1];
-            }
-            
-            # Network
-            if ($net_max < $net_recv) {
-                $net_max = $net_recv;
-            }
-            
-            if ($net_max < $net_send) {
-                $net_max = $net_send;
+            if ($memory_size < $cols[4] + $cols[5] + $cols[6] + $cols[7]) {
+                $memory_size = $cols[4] + $cols[5] + $cols[6] + $cols[7];
             }
         }
     }
@@ -468,14 +403,6 @@ sub create_graph {
     # Processes running
     @options = @template;
     
-    push @options, '--upper-limit';
-    
-    if ($procs_max < 10) {
-        push @options, 10;
-    } else {
-        push @options, $procs_max;
-    }
-    
     push @options, '--title';
     push @options, 'Processes running';
     
@@ -494,14 +421,6 @@ sub create_graph {
     
     # Processes blocked
     @options = @template;
-    
-    push @options, '--upper-limit';
-    
-    if ($procs_max < 10) {
-        push @options, 10;
-    } else {
-        push @options, $procs_max;
-    }
     
     push @options, '--title';
     push @options, 'Processes blocked';
@@ -522,14 +441,6 @@ sub create_graph {
     # Processes new
     @options = @template;
     
-    push @options, '--upper-limit';
-    
-    if ($procs_new_max < 10) {
-        push @options, 10;
-    } else {
-        push @options, $procs_new_max;
-    }
-    
     push @options, '--title';
     push @options, 'Processes new';
     
@@ -548,14 +459,6 @@ sub create_graph {
     
     # Memory
     @options = @template;
-    
-    push @options, '--upper-limit';
-    
-    if ($memory_max < 10) {
-        push @options, 10;
-    } else {
-        push @options, $memory_max;
-    }
     
     push @options, '--base';
     push @options, 1024;
@@ -582,14 +485,6 @@ sub create_graph {
     # Paging
     @options = @template;
     
-    push @options, '--upper-limit';
-    
-    if ($paging_max < 10) {
-        push @options, 10;
-    } else {
-        push @options, $paging_max;
-    }
-    
     push @options, '--base';
     push @options, 1024;
     
@@ -612,14 +507,9 @@ sub create_graph {
     # Disk total
     @options = @template;
     
-    push @options, '--upper-limit';
-    
     if ($disk_limit != 0) {
+        push @options, '--upper-limit';
         push @options, $disk_limit;
-    } elsif ($disk_max < 10) {
-        push @options, 10;
-    } else {
-        push @options, $disk_max;
     }
     
     push @options, '--base';
@@ -645,14 +535,9 @@ sub create_graph {
     foreach my $disk (sort keys %index_disk) {
         @options = @template;
         
-        push @options, '--upper-limit';
-        
         if ($disk_limit != 0) {
+            push @options, '--upper-limit';
             push @options, $disk_limit;
-        } elsif ($disk_max < 10) {
-            push @options, 10;
-        } else {
-            push @options, $disk_max;
         }
         
         push @options, '--base';
@@ -678,14 +563,6 @@ sub create_graph {
     # Interrupts
     @options = @template;
     
-    push @options, '--upper-limit';
-    
-    if ($interrupts_max < 10) {
-        push @options, 10;
-    } else {
-        push @options, $interrupts_max;
-    }
-    
     push @options, '--title';
     push @options, 'Interrupts (/sec)';
     
@@ -701,14 +578,6 @@ sub create_graph {
     
     # Context Switches
     @options = @template;
-    
-    push @options, '--upper-limit';
-    
-    if ($cswitches_max < 10) {
-        push @options, 10;
-    } else {
-        push @options, $cswitches_max;
-    }
     
     push @options, '--title';
     push @options, 'Context Switches (/sec)';
@@ -790,14 +659,9 @@ sub create_graph {
     # Network total
     @options = @template;
     
-    push @options, '--upper-limit';
-    
     if ($net_limit != 0) {
+        push @options, '--upper-limit';
         push @options, $net_limit;
-    } elsif ($net_max < 10) {
-        push @options, 10;
-    } else {
-        push @options, $net_max;
     }
     
     push @options, '--base';
@@ -823,14 +687,9 @@ sub create_graph {
     foreach my $net (sort keys %index_net) {
         @options = @template;
         
-        push @options, '--upper-limit';
-        
         if ($net_limit != 0) {
+            push @options, '--upper-limit';
             push @options, $net_limit;
-        } elsif ($net_max < 10) {
-            push @options, 10;
-        } else {
-            push @options, $net_max;
         }
         
         push @options, '--base';
