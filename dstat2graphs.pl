@@ -5,7 +5,7 @@ use warnings;
 
 use File::Path;
 use HTML::Entities;
-use POSIX qw/floor/;
+use POSIX qw/floor ceil/;
 use RRDs;
 use Text::ParseWords;
 use Time::Local;
@@ -151,7 +151,8 @@ sub load_csv {
 
 sub create_rrd {
     my @options;
-    my $count = $end_time - $start_time + 1;
+    my $steps = floor(($end_time - $start_time) / 3600) + 1;
+    my $rows = ceil(($end_time - $start_time) / $steps) + 1;
     
     # --start
     push @options, '--start';
@@ -163,103 +164,103 @@ sub create_rrd {
     
     # Processes
     push @options, 'DS:PROCS_RUN:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:PROCS_BLK:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:PROCS_NEW:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     # Memory
     push @options, 'DS:MEMORY_USED:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:MEMORY_BUFF:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:MEMORY_CACH:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     # Paging
     push @options, 'DS:PAGE_IN:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:PAGE_OUT:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     # Disk total
     push @options, 'DS:DISK_READ:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:DISK_WRIT:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     # Disk individual
     foreach my $disk (sort keys %index_disk) {
         push @options, "DS:DISK_${disk}_READ:GAUGE:5:U:U";
-        push @options, "RRA:AVERAGE:0.5:1:${count}";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
         push @options, "DS:DISK_${disk}_WRIT:GAUGE:5:U:U";
-        push @options, "RRA:AVERAGE:0.5:1:${count}";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     }
     
     # Interrupts
     push @options, 'DS:INTERRUPTS:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     # Context Switches
     push @options, 'DS:CSWITCHES:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     # CPU total
     push @options, 'DS:CPU_USR:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:CPU_SYS:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:CPU_HIQ:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:CPU_SIQ:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:CPU_WAI:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     # CPU individual
     foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
         push @options, "DS:CPU${cpu}_USR:GAUGE:5:U:U";
-        push @options, "RRA:AVERAGE:0.5:1:${count}";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
         push @options, "DS:CPU${cpu}_SYS:GAUGE:5:U:U";
-        push @options, "RRA:AVERAGE:0.5:1:${count}";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
         push @options, "DS:CPU${cpu}_HIQ:GAUGE:5:U:U";
-        push @options, "RRA:AVERAGE:0.5:1:${count}";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
         push @options, "DS:CPU${cpu}_SIQ:GAUGE:5:U:U";
-        push @options, "RRA:AVERAGE:0.5:1:${count}";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
         push @options, "DS:CPU${cpu}_WAI:GAUGE:5:U:U";
-        push @options, "RRA:AVERAGE:0.5:1:${count}";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     }
     
     # Network total
     push @options, 'DS:NET_RECV:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     push @options, 'DS:NET_SEND:GAUGE:5:U:U';
-    push @options, "RRA:AVERAGE:0.5:1:${count}";
+    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
     # Network individual
     foreach my $net (sort keys %index_net) {
         push @options, "DS:NET_${net}_RECV:GAUGE:5:U:U";
-        push @options, "RRA:AVERAGE:0.5:1:${count}";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
         push @options, "DS:NET_${net}_SEND:GAUGE:5:U:U";
-        push @options, "RRA:AVERAGE:0.5:1:${count}";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     }
     
     RRDs::create($rrd_file, @options);
