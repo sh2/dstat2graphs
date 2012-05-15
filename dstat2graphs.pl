@@ -5,6 +5,7 @@ use warnings;
 
 use File::Path;
 use HTML::Entities;
+use POSIX qw/floor/;
 use RRDs;
 use Text::ParseWords;
 use Time::Local;
@@ -381,6 +382,7 @@ sub create_dir {
 
 sub create_graph {
     my (@template, @options);
+    my $window = (floor(($end_time - $start_time) / 3600) + 1) * 60;
     
     # Template
     push @template, '--start';
@@ -409,8 +411,8 @@ sub create_graph {
     push @options, "DEF:RUN=${rrd_file}:PROCS_RUN:AVERAGE";
     push @options, "AREA:RUN#${colors[0]}:running";
     
-    push @options, "DEF:RUN_AVG=${rrd_file}:PROCS_RUN:AVERAGE:step=60";
-    push @options, "LINE2:RUN_AVG#${colors[1]}:running_avg";
+    push @options, "CDEF:RUN_AVG=RUN,${window},TREND";
+    push @options, "LINE1:RUN_AVG#${colors[1]}:running_${window}sec";
     
     RRDs::graph("${report_dir}/procs_run.png", @options);
     
@@ -428,8 +430,8 @@ sub create_graph {
     push @options, "DEF:BLK=${rrd_file}:PROCS_BLK:AVERAGE";
     push @options, "AREA:BLK#${colors[0]}:blocked";
     
-    push @options, "DEF:BLK_AVG=${rrd_file}:PROCS_BLK:AVERAGE:step=60";
-    push @options, "LINE2:BLK_AVG#${colors[1]}:blocked_avg";
+    push @options, "CDEF:BLK_AVG=BLK,${window},TREND";
+    push @options, "LINE1:BLK_AVG#${colors[1]}:blocked_${window}sec";
     
     RRDs::graph("${report_dir}/procs_blk.png", @options);
     
@@ -447,8 +449,8 @@ sub create_graph {
     push @options, "DEF:NEW=${rrd_file}:PROCS_NEW:AVERAGE";
     push @options, "AREA:NEW#${colors[0]}:new";
     
-    push @options, "DEF:NEW_AVG=${rrd_file}:PROCS_NEW:AVERAGE:step=60";
-    push @options, "LINE2:NEW_AVG#${colors[1]}:new_avg";
+    push @options, "CDEF:NEW_AVG=NEW,${window},TREND";
+    push @options, "LINE1:NEW_AVG#${colors[1]}:new_${window}sec";
     
     RRDs::graph("${report_dir}/procs_new.png", @options);
     
