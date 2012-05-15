@@ -460,6 +460,9 @@ sub create_graph {
     # Memory
     @options = @template;
     
+    push @options, '--upper-limit';
+    push @options, $memory_size;
+    
     push @options, '--base';
     push @options, 1024;
     
