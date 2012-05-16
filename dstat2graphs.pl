@@ -445,7 +445,7 @@ sub create_graph {
     @options = @template;
     
     push @options, '--title';
-    push @options, 'Processes new';
+    push @options, 'Processes new (/sec)';
     
     push @options, "DEF:NEW=${rrd_file}:PROCS_NEW:AVERAGE";
     push @options, "AREA:NEW#${colors[0]}:new";
