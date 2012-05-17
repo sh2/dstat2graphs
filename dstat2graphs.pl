@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Archive::Zip qw/AZ_OK/;
 use File::Path;
 use HTML::Entities;
 use POSIX qw/floor ceil/;
@@ -47,6 +48,7 @@ my ($start_time, $end_time, $memory_size) = (0, 0, 0);
 &create_graph();
 &delete_rrd();
 &create_html();
+&create_zip();
 
 sub load_csv {
     open(my $fh, '<', "${csv_file}") or die $!;
@@ -731,6 +733,7 @@ sub create_html {
         $year + 1900, $mon + 1, $mday, $hour, $min, $sec); 
         
     my $duration = $end_time - $start_time;
+    my ($report_suffix) = $report_dir =~ /([^\/]+)\/*$/;
     
     open(my $fh, '>', "${report_dir}/index.html") or die $!;
     
@@ -812,6 +815,7 @@ _EOF_
               <li>Duration: ${duration} (seconds)</li>
             </ul>
           </div>
+          <p><a href="d_${report_suffix}.zip">Download a Zip file</a></p>
           <h2>Processes</h2>
           <h3 id="procs_run">Processes running</h3>
           <p><img src="procs_run.png" alt="Processes running" /></p>
@@ -889,6 +893,17 @@ _EOF_
 _EOF_
     
     close($fh);
+}
+
+sub create_zip {
+    my ($report_suffix) = $report_dir =~ /([^\/]+)\/*$/;
+    my $zip = Archive::Zip->new();
+    
+    $zip->addTreeMatching($report_dir, $report_suffix, '\.(html|png)$');
+    
+    if ($zip->writeToFileNamed("${report_dir}/d_${report_suffix}.zip") != AZ_OK) {
+        die;
+    }
 }
 
 sub random_str {

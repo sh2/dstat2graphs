@@ -15,6 +15,11 @@ Red Hat Enterprise Linux 5の場合はEPELリポジトリから入手してく�
 
     # yum install rrdtool rrdtool-perl
 
+PerlのArchive::Zipモジュールも必要ですので、
+以下のようにしてインストールしてください。
+
+    # yum install perl-Archive-Zip
+
 本ツールは作業ディレクトリとして/dev/shmを利用します。
 以下のようにして作業ディレクトリを作成してください。
 本ツールを恒久的に使用する場合は、/etc/rc.localに
