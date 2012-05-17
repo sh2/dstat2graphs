@@ -575,7 +575,10 @@ sub create_graph {
     push @options, 'Interrupts (/sec)';
     
     push @options, "DEF:INT=${rrd_file}:INTERRUPTS:AVERAGE";
-    push @options, "LINE1:INT#${colors[0]}:interrupts";
+    push @options, "AREA:INT#${colors[0]}:interrupts";
+    
+    push @options, "CDEF:INT_AVG=INT,${window},TREND";
+    push @options, "LINE1:INT_AVG#${colors[1]}:interrupts_${window}sec";
     
     RRDs::graph("${report_dir}/interrupts.png", @options);
     
@@ -591,7 +594,10 @@ sub create_graph {
     push @options, 'Context Switches (/sec)';
     
     push @options, "DEF:CSW=${rrd_file}:CSWITCHES:AVERAGE";
-    push @options, "LINE1:CSW#${colors[0]}:context_switches";
+    push @options, "AREA:CSW#${colors[0]}:context_switches";
+    
+    push @options, "CDEF:CSW_AVG=CSW,${window},TREND";
+    push @options, "LINE1:CSW_AVG#${colors[1]}:context_switches_${window}sec";
     
     RRDs::graph("${report_dir}/cswitches.png", @options);
     
