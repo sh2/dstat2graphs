@@ -38,7 +38,7 @@ my $epoch = 978274800; # 2001/01/01 00:00:00
 my $top_dir = '..';
 my $rrd_file = '/dev/shm/dstat2graphs/' . &random_str() . '.rrd';
 
-my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net);
+my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net, %value);
 my ($start_time, $end_time, $memory_size) = (0, 0, 0);
 
 &load_csv();
@@ -384,7 +384,7 @@ sub create_dir {
 }
 
 sub create_graph {
-    my (@template, @options);
+    my (@template, @options, @values);
     my $window = (floor(($end_time - $start_time) / 3600) + 1) * 60;
     
     # Template
@@ -630,12 +630,56 @@ sub create_graph {
     push @options, "DEF:WAI=${rrd_file}:CPU_WAI:AVERAGE";
     push @options, "STACK:WAI#${colors[4]}:wait";
     
-    RRDs::graph("${report_dir}/cpu.png", @options);
+    push @options, "VDEF:U_MIN=USR,MINIMUM";
+    push @options, "PRINT:U_MIN:%3.2lf";
+    push @options, "VDEF:U_AVG=USR,AVERAGE";
+    push @options, "PRINT:U_AVG:%3.2lf";
+    push @options, "VDEF:U_MAX=USR,MAXIMUM";
+    push @options, "PRINT:U_MAX:%3.2lf";
+    
+    push @options, "CDEF:US=USR,SYS,+";
+    push @options, "VDEF:US_MIN=US,MINIMUM";
+    push @options, "PRINT:US_MIN:%3.2lf";
+    push @options, "VDEF:US_AVG=US,AVERAGE";
+    push @options, "PRINT:US_AVG:%3.2lf";
+    push @options, "VDEF:US_MAX=US,MAXIMUM";
+    push @options, "PRINT:US_MAX:%3.2lf";
+    
+    push @options, "CDEF:USHS=USR,SYS,+,HIQ,+,SIQ,+";
+    push @options, "VDEF:USHS_MIN=USHS,MINIMUM";
+    push @options, "PRINT:USHS_MIN:%3.2lf";
+    push @options, "VDEF:USHS_AVG=USHS,AVERAGE";
+    push @options, "PRINT:USHS_AVG:%3.2lf";
+    push @options, "VDEF:USHS_MAX=USHS,MAXIMUM";
+    push @options, "PRINT:USHS_MAX:%3.2lf";
+    
+    push @options, "CDEF:USHSW=USR,SYS,+,HIQ,+,SIQ,+,WAI,+";
+    push @options, "VDEF:USHSW_MIN=USHSW,MINIMUM";
+    push @options, "PRINT:USHSW_MIN:%3.2lf";
+    push @options, "VDEF:USHSW_AVG=USHSW,AVERAGE";
+    push @options, "PRINT:USHSW_AVG:%3.2lf";
+    push @options, "VDEF:USHSW_MAX=USHSW,MAXIMUM";
+    push @options, "PRINT:USHSW_MAX:%3.2lf";
+    
+    @values = RRDs::graph("${report_dir}/cpu.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
+    
+    $value{'CPU'}->{'U_MIN'} = $values[0]->[0];
+    $value{'CPU'}->{'U_AVG'} = $values[0]->[1];
+    $value{'CPU'}->{'U_MAX'} = $values[0]->[2];
+    $value{'CPU'}->{'US_MIN'} = $values[0]->[3];
+    $value{'CPU'}->{'US_AVG'} = $values[0]->[4];
+    $value{'CPU'}->{'US_MAX'} = $values[0]->[5];
+    $value{'CPU'}->{'USHS_MIN'} = $values[0]->[6];
+    $value{'CPU'}->{'USHS_AVG'} = $values[0]->[7];
+    $value{'CPU'}->{'USHS_MAX'} = $values[0]->[8];
+    $value{'CPU'}->{'USHSW_MIN'} = $values[0]->[9];
+    $value{'CPU'}->{'USHSW_AVG'} = $values[0]->[10];
+    $value{'CPU'}->{'USHSW_MAX'} = $values[0]->[11];
     
     # CPU individual
     foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
@@ -662,12 +706,56 @@ sub create_graph {
         push @options, "DEF:WAI=${rrd_file}:CPU${cpu}_WAI:AVERAGE";
         push @options, "STACK:WAI#${colors[4]}:wait";
         
-        RRDs::graph("${report_dir}/cpu${cpu}.png", @options);
+        push @options, "VDEF:U_MIN=USR,MINIMUM";
+        push @options, "PRINT:U_MIN:%3.2lf";
+        push @options, "VDEF:U_AVG=USR,AVERAGE";
+        push @options, "PRINT:U_AVG:%3.2lf";
+        push @options, "VDEF:U_MAX=USR,MAXIMUM";
+        push @options, "PRINT:U_MAX:%3.2lf";
+        
+        push @options, "CDEF:US=USR,SYS,+";
+        push @options, "VDEF:US_MIN=US,MINIMUM";
+        push @options, "PRINT:US_MIN:%3.2lf";
+        push @options, "VDEF:US_AVG=US,AVERAGE";
+        push @options, "PRINT:US_AVG:%3.2lf";
+        push @options, "VDEF:US_MAX=US,MAXIMUM";
+        push @options, "PRINT:US_MAX:%3.2lf";
+        
+        push @options, "CDEF:USHS=USR,SYS,+,HIQ,+,SIQ,+";
+        push @options, "VDEF:USHS_MIN=USHS,MINIMUM";
+        push @options, "PRINT:USHS_MIN:%3.2lf";
+        push @options, "VDEF:USHS_AVG=USHS,AVERAGE";
+        push @options, "PRINT:USHS_AVG:%3.2lf";
+        push @options, "VDEF:USHS_MAX=USHS,MAXIMUM";
+        push @options, "PRINT:USHS_MAX:%3.2lf";
+        
+        push @options, "CDEF:USHSW=USR,SYS,+,HIQ,+,SIQ,+,WAI,+";
+        push @options, "VDEF:USHSW_MIN=USHSW,MINIMUM";
+        push @options, "PRINT:USHSW_MIN:%3.2lf";
+        push @options, "VDEF:USHSW_AVG=USHSW,AVERAGE";
+        push @options, "PRINT:USHSW_AVG:%3.2lf";
+        push @options, "VDEF:USHSW_MAX=USHSW,MAXIMUM";
+        push @options, "PRINT:USHSW_MAX:%3.2lf";
+        
+        @values = RRDs::graph("${report_dir}/cpu${cpu}.png", @options);
         
         if (my $error = RRDs::error) {
             &delete_rrd();
             die $error;
         }
+        
+        $value{"CPU${cpu}"}->{'U_MIN'} = $values[0]->[0];
+        $value{"CPU${cpu}"}->{'U_AVG'} = $values[0]->[1];
+        $value{"CPU${cpu}"}->{'U_MAX'} = $values[0]->[2];
+        $value{"CPU${cpu}"}->{'US_MIN'} = $values[0]->[3];
+        $value{"CPU${cpu}"}->{'US_AVG'} = $values[0]->[4];
+        $value{"CPU${cpu}"}->{'US_MAX'} = $values[0]->[5];
+        $value{"CPU${cpu}"}->{'USHS_MIN'} = $values[0]->[6];
+        $value{"CPU${cpu}"}->{'USHS_AVG'} = $values[0]->[7];
+        $value{"CPU${cpu}"}->{'USHS_MAX'} = $values[0]->[8];
+        $value{"CPU${cpu}"}->{'USHSW_MIN'} = $values[0]->[9];
+        $value{"CPU${cpu}"}->{'USHSW_AVG'} = $values[0]->[10];
+        $value{"CPU${cpu}"}->{'USHSW_MAX'} = $values[0]->[11];
     }
     
     # Network total
@@ -759,6 +847,12 @@ sub create_html {
       }
       .hero-unit {
         padding: 24px;
+      }
+      th.header {
+        text-align: center;
+      }
+      td.number {
+        text-align: right;
       }
     </style>
   </head>
@@ -861,13 +955,85 @@ _EOF_
           <h2>CPU Usage</h2>
           <h3 id="cpu">CPU Usage total</h3>
           <p><img src="cpu.png" alt="CPU Usage total" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">CPU Usage</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>user</td>
+                <td class="number">$value{'CPU'}->{'U_MIN'} %</td>
+                <td class="number">$value{'CPU'}->{'U_AVG'} %</td>
+                <td class="number">$value{'CPU'}->{'U_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system</td>
+                <td class="number">$value{'CPU'}->{'US_MIN'} %</td>
+                <td class="number">$value{'CPU'}->{'US_AVG'} %</td>
+                <td class="number">$value{'CPU'}->{'US_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system+hardirq+softirq</td>
+                <td class="number">$value{'CPU'}->{'USHS_MIN'} %</td>
+                <td class="number">$value{'CPU'}->{'USHS_AVG'} %</td>
+                <td class="number">$value{'CPU'}->{'USHS_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system+hardirq+softirq+wait</td>
+                <td class="number">$value{'CPU'}->{'USHSW_MIN'} %</td>
+                <td class="number">$value{'CPU'}->{'USHSW_AVG'} %</td>
+                <td class="number">$value{'CPU'}->{'USHSW_MAX'} %</td>
+              </tr>
+            </tbody>
+          </table>
 _EOF_
     
     foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
-        print $fh ' ' x 10;
-        print $fh "<h3 id=\"cpu${cpu}\">CPU Usage cpu${cpu}</h3>\n";
-        print $fh ' ' x 10;
-        print $fh "<p><img src=\"cpu${cpu}.png\" alt=\"CPU Usage cpu${cpu}\" /></p>\n";
+        print $fh <<_EOF_;
+          <h3 id="cpu${cpu}">CPU Usage cpu${cpu}</h3>
+          <p><img src="cpu${cpu}.png" alt="CPU Usage cpu${cpu}" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">CPU Usage</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>user</td>
+                <td class="number">$value{"CPU${cpu}"}->{'U_MIN'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'U_AVG'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'U_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system</td>
+                <td class="number">$value{"CPU${cpu}"}->{'US_MIN'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'US_AVG'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'US_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system+hardirq+softirq</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USHS_MIN'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USHS_AVG'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USHS_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system+hardirq+softirq+wait</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USHSW_MIN'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USHSW_AVG'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USHSW_MAX'} %</td>
+              </tr>
+            </tbody>
+          </table>
+_EOF_
     }
     
     print $fh <<_EOF_;
