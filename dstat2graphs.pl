@@ -417,12 +417,23 @@ sub create_graph {
     push @options, "CDEF:RUN_AVG=RUN,${window},TREND";
     push @options, "LINE1:RUN_AVG#${colors[1]}:running_${window}sec";
     
-    RRDs::graph("${report_dir}/procs_run.png", @options);
+    push @options, "VDEF:MIN=RUN,MINIMUM";
+    push @options, "PRINT:MIN:%4.2lf";
+    push @options, "VDEF:AVG=RUN,AVERAGE";
+    push @options, "PRINT:AVG:%4.2lf";
+    push @options, "VDEF:MAX=RUN,MAXIMUM";
+    push @options, "PRINT:MAX:%4.2lf";
+    
+    @values = RRDs::graph("${report_dir}/procs_run.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
+    
+    $value{'PROCS_RUN'}->{'MIN'} = $values[0]->[0];
+    $value{'PROCS_RUN'}->{'AVG'} = $values[0]->[1];
+    $value{'PROCS_RUN'}->{'MAX'} = $values[0]->[2];
     
     # Processes blocked
     @options = @template;
@@ -436,12 +447,23 @@ sub create_graph {
     push @options, "CDEF:BLK_AVG=BLK,${window},TREND";
     push @options, "LINE1:BLK_AVG#${colors[1]}:blocked_${window}sec";
     
-    RRDs::graph("${report_dir}/procs_blk.png", @options);
+    push @options, "VDEF:MIN=BLK,MINIMUM";
+    push @options, "PRINT:MIN:%4.2lf";
+    push @options, "VDEF:AVG=BLK,AVERAGE";
+    push @options, "PRINT:AVG:%4.2lf";
+    push @options, "VDEF:MAX=BLK,MAXIMUM";
+    push @options, "PRINT:MAX:%4.2lf";
+    
+    @values = RRDs::graph("${report_dir}/procs_blk.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
+    
+    $value{'PROCS_BLK'}->{'MIN'} = $values[0]->[0];
+    $value{'PROCS_BLK'}->{'AVG'} = $values[0]->[1];
+    $value{'PROCS_BLK'}->{'MAX'} = $values[0]->[2];
     
     # Processes new
     @options = @template;
@@ -455,12 +477,23 @@ sub create_graph {
     push @options, "CDEF:NEW_AVG=NEW,${window},TREND";
     push @options, "LINE1:NEW_AVG#${colors[1]}:new_${window}sec";
     
-    RRDs::graph("${report_dir}/procs_new.png", @options);
+    push @options, "VDEF:MIN=NEW,MINIMUM";
+    push @options, "PRINT:MIN:%4.2lf";
+    push @options, "VDEF:AVG=NEW,AVERAGE";
+    push @options, "PRINT:AVG:%4.2lf";
+    push @options, "VDEF:MAX=NEW,MAXIMUM";
+    push @options, "PRINT:MAX:%4.2lf";
+    
+    @values = RRDs::graph("${report_dir}/procs_new.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
+    
+    $value{'PROCS_NEW'}->{'MIN'} = $values[0]->[0];
+    $value{'PROCS_NEW'}->{'AVG'} = $values[0]->[1];
+    $value{'PROCS_NEW'}->{'MAX'} = $values[0]->[2];
     
     # Memory
     @options = @template;
@@ -483,12 +516,34 @@ sub create_graph {
     push @options, "DEF:CACH=${rrd_file}:MEMORY_CACH:AVERAGE";
     push @options, "STACK:CACH#${colors[2]}:cached";
     
-    RRDs::graph("${report_dir}/memory.png", @options);
+    push @options, "VDEF:U_MIN=USED,MINIMUM";
+    push @options, "PRINT:U_MIN:%4.2lf %s";
+    push @options, "VDEF:U_AVG=USED,AVERAGE";
+    push @options, "PRINT:U_AVG:%4.2lf %s";
+    push @options, "VDEF:U_MAX=USED,MAXIMUM";
+    push @options, "PRINT:U_MAX:%4.2lf %s";
+    
+    push @options, "CDEF:UBC=USED,BUFF,+,CACH,+";
+    push @options, "VDEF:UBC_MIN=UBC,MINIMUM";
+    push @options, "PRINT:UBC_MIN:%4.2lf %s";
+    push @options, "VDEF:UBC_AVG=UBC,AVERAGE";
+    push @options, "PRINT:UBC_AVG:%4.2lf %s";
+    push @options, "VDEF:UBC_MAX=UBC,MAXIMUM";
+    push @options, "PRINT:UBC_MAX:%4.2lf %s";
+    
+    @values = RRDs::graph("${report_dir}/memory.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
+    
+    $value{'MEMORY'}->{'U_MIN'} = $values[0]->[0];
+    $value{'MEMORY'}->{'U_AVG'} = $values[0]->[1];
+    $value{'MEMORY'}->{'U_MAX'} = $values[0]->[2];
+    $value{'MEMORY'}->{'UBC_MIN'} = $values[0]->[3];
+    $value{'MEMORY'}->{'UBC_AVG'} = $values[0]->[4];
+    $value{'MEMORY'}->{'UBC_MAX'} = $values[0]->[5];
     
     # Paging
     @options = @template;
@@ -505,12 +560,33 @@ sub create_graph {
     push @options, "DEF:OUT=${rrd_file}:PAGE_OUT:AVERAGE";
     push @options, "LINE1:OUT#${colors[1]}:page_out";
     
-    RRDs::graph("${report_dir}/paging.png", @options);
+    push @options, "VDEF:I_MIN=IN,MINIMUM";
+    push @options, "PRINT:I_MIN:%4.2lf %s";
+    push @options, "VDEF:I_AVG=IN,AVERAGE";
+    push @options, "PRINT:I_AVG:%4.2lf %s";
+    push @options, "VDEF:I_MAX=IN,MAXIMUM";
+    push @options, "PRINT:I_MAX:%4.2lf %s";
+    
+    push @options, "VDEF:O_MIN=OUT,MINIMUM";
+    push @options, "PRINT:O_MIN:%4.2lf %s";
+    push @options, "VDEF:O_AVG=OUT,AVERAGE";
+    push @options, "PRINT:O_AVG:%4.2lf %s";
+    push @options, "VDEF:O_MAX=OUT,MAXIMUM";
+    push @options, "PRINT:O_MAX:%4.2lf %s";
+    
+    @values = RRDs::graph("${report_dir}/paging.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
+    
+    $value{'PAGE'}->{'I_MIN'} = $values[0]->[0];
+    $value{'PAGE'}->{'I_AVG'} = $values[0]->[1];
+    $value{'PAGE'}->{'I_MAX'} = $values[0]->[2];
+    $value{'PAGE'}->{'O_MIN'} = $values[0]->[3];
+    $value{'PAGE'}->{'O_AVG'} = $values[0]->[4];
+    $value{'PAGE'}->{'O_MAX'} = $values[0]->[5];
     
     # Disk total
     @options = @template;
@@ -532,12 +608,33 @@ sub create_graph {
     push @options, "DEF:WRIT=${rrd_file}:DISK_WRIT:AVERAGE";
     push @options, "LINE1:WRIT#${colors[1]}:write";
     
-    RRDs::graph("${report_dir}/disk.png", @options);
+    push @options, "VDEF:R_MIN=READ,MINIMUM";
+    push @options, "PRINT:R_MIN:%4.2lf %s";
+    push @options, "VDEF:R_AVG=READ,AVERAGE";
+    push @options, "PRINT:R_AVG:%4.2lf %s";
+    push @options, "VDEF:R_MAX=READ,MAXIMUM";
+    push @options, "PRINT:R_MAX:%4.2lf %s";
+    
+    push @options, "VDEF:W_MIN=WRIT,MINIMUM";
+    push @options, "PRINT:W_MIN:%4.2lf %s";
+    push @options, "VDEF:W_AVG=WRIT,AVERAGE";
+    push @options, "PRINT:W_AVG:%4.2lf %s";
+    push @options, "VDEF:W_MAX=WRIT,MAXIMUM";
+    push @options, "PRINT:W_MAX:%4.2lf %s";
+    
+    @values = RRDs::graph("${report_dir}/disk.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
+    
+    $value{'DISK'}->{'R_MIN'} = $values[0]->[0];
+    $value{'DISK'}->{'R_AVG'} = $values[0]->[1];
+    $value{'DISK'}->{'R_MAX'} = $values[0]->[2];
+    $value{'DISK'}->{'W_MIN'} = $values[0]->[3];
+    $value{'DISK'}->{'W_AVG'} = $values[0]->[4];
+    $value{'DISK'}->{'W_MAX'} = $values[0]->[5];
     
     # Disk individual
     foreach my $disk (sort keys %index_disk) {
@@ -560,12 +657,33 @@ sub create_graph {
         push @options, "DEF:WRIT=${rrd_file}:DISK_${disk}_WRIT:AVERAGE";
         push @options, "LINE1:WRIT#${colors[1]}:write";
         
-        RRDs::graph("${report_dir}/disk_${disk}.png", @options);
+        push @options, "VDEF:R_MIN=READ,MINIMUM";
+        push @options, "PRINT:R_MIN:%4.2lf %s";
+        push @options, "VDEF:R_AVG=READ,AVERAGE";
+        push @options, "PRINT:R_AVG:%4.2lf %s";
+        push @options, "VDEF:R_MAX=READ,MAXIMUM";
+        push @options, "PRINT:R_MAX:%4.2lf %s";
+        
+        push @options, "VDEF:W_MIN=WRIT,MINIMUM";
+        push @options, "PRINT:W_MIN:%4.2lf %s";
+        push @options, "VDEF:W_AVG=WRIT,AVERAGE";
+        push @options, "PRINT:W_AVG:%4.2lf %s";
+        push @options, "VDEF:W_MAX=WRIT,MAXIMUM";
+        push @options, "PRINT:W_MAX:%4.2lf %s";
+        
+        @values = RRDs::graph("${report_dir}/disk_${disk}.png", @options);
         
         if (my $error = RRDs::error) {
             &delete_rrd();
             die $error;
         }
+        
+        $value{"DISK_${disk}"}->{'R_MIN'} = $values[0]->[0];
+        $value{"DISK_${disk}"}->{'R_AVG'} = $values[0]->[1];
+        $value{"DISK_${disk}"}->{'R_MAX'} = $values[0]->[2];
+        $value{"DISK_${disk}"}->{'W_MIN'} = $values[0]->[3];
+        $value{"DISK_${disk}"}->{'W_AVG'} = $values[0]->[4];
+        $value{"DISK_${disk}"}->{'W_MAX'} = $values[0]->[5];
     }
     
     # Interrupts
@@ -580,12 +698,23 @@ sub create_graph {
     push @options, "CDEF:INT_AVG=INT,${window},TREND";
     push @options, "LINE1:INT_AVG#${colors[1]}:interrupts_${window}sec";
     
-    RRDs::graph("${report_dir}/interrupts.png", @options);
+    push @options, "VDEF:MIN=INT,MINIMUM";
+    push @options, "PRINT:MIN:%4.2lf";
+    push @options, "VDEF:AVG=INT,AVERAGE";
+    push @options, "PRINT:AVG:%4.2lf";
+    push @options, "VDEF:MAX=INT,MAXIMUM";
+    push @options, "PRINT:MAX:%4.2lf";
+    
+    @values = RRDs::graph("${report_dir}/interrupts.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
+    
+    $value{'INTERRUPTS'}->{'MIN'} = $values[0]->[0];
+    $value{'INTERRUPTS'}->{'AVG'} = $values[0]->[1];
+    $value{'INTERRUPTS'}->{'MAX'} = $values[0]->[2];
     
     # Context Switches
     @options = @template;
@@ -599,12 +728,23 @@ sub create_graph {
     push @options, "CDEF:CSW_AVG=CSW,${window},TREND";
     push @options, "LINE1:CSW_AVG#${colors[1]}:context_switches_${window}sec";
     
-    RRDs::graph("${report_dir}/cswitches.png", @options);
+    push @options, "VDEF:MIN=CSW,MINIMUM";
+    push @options, "PRINT:MIN:%4.2lf";
+    push @options, "VDEF:AVG=CSW,AVERAGE";
+    push @options, "PRINT:AVG:%4.2lf";
+    push @options, "VDEF:MAX=CSW,MAXIMUM";
+    push @options, "PRINT:MAX:%4.2lf";
+    
+    @values = RRDs::graph("${report_dir}/cswitches.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
+    
+    $value{'CSWITCHES'}->{'MIN'} = $values[0]->[0];
+    $value{'CSWITCHES'}->{'AVG'} = $values[0]->[1];
+    $value{'CSWITCHES'}->{'MAX'} = $values[0]->[2];
     
     # CPU total
     @options = @template;
@@ -631,35 +771,35 @@ sub create_graph {
     push @options, "STACK:WAI#${colors[4]}:wait";
     
     push @options, "VDEF:U_MIN=USR,MINIMUM";
-    push @options, "PRINT:U_MIN:%3.2lf";
+    push @options, "PRINT:U_MIN:%4.2lf";
     push @options, "VDEF:U_AVG=USR,AVERAGE";
-    push @options, "PRINT:U_AVG:%3.2lf";
+    push @options, "PRINT:U_AVG:%4.2lf";
     push @options, "VDEF:U_MAX=USR,MAXIMUM";
-    push @options, "PRINT:U_MAX:%3.2lf";
+    push @options, "PRINT:U_MAX:%4.2lf";
     
     push @options, "CDEF:US=USR,SYS,+";
     push @options, "VDEF:US_MIN=US,MINIMUM";
-    push @options, "PRINT:US_MIN:%3.2lf";
+    push @options, "PRINT:US_MIN:%4.2lf";
     push @options, "VDEF:US_AVG=US,AVERAGE";
-    push @options, "PRINT:US_AVG:%3.2lf";
+    push @options, "PRINT:US_AVG:%4.2lf";
     push @options, "VDEF:US_MAX=US,MAXIMUM";
-    push @options, "PRINT:US_MAX:%3.2lf";
+    push @options, "PRINT:US_MAX:%4.2lf";
     
     push @options, "CDEF:USHS=USR,SYS,+,HIQ,+,SIQ,+";
     push @options, "VDEF:USHS_MIN=USHS,MINIMUM";
-    push @options, "PRINT:USHS_MIN:%3.2lf";
+    push @options, "PRINT:USHS_MIN:%4.2lf";
     push @options, "VDEF:USHS_AVG=USHS,AVERAGE";
-    push @options, "PRINT:USHS_AVG:%3.2lf";
+    push @options, "PRINT:USHS_AVG:%4.2lf";
     push @options, "VDEF:USHS_MAX=USHS,MAXIMUM";
-    push @options, "PRINT:USHS_MAX:%3.2lf";
+    push @options, "PRINT:USHS_MAX:%4.2lf";
     
     push @options, "CDEF:USHSW=USR,SYS,+,HIQ,+,SIQ,+,WAI,+";
     push @options, "VDEF:USHSW_MIN=USHSW,MINIMUM";
-    push @options, "PRINT:USHSW_MIN:%3.2lf";
+    push @options, "PRINT:USHSW_MIN:%4.2lf";
     push @options, "VDEF:USHSW_AVG=USHSW,AVERAGE";
-    push @options, "PRINT:USHSW_AVG:%3.2lf";
+    push @options, "PRINT:USHSW_AVG:%4.2lf";
     push @options, "VDEF:USHSW_MAX=USHSW,MAXIMUM";
-    push @options, "PRINT:USHSW_MAX:%3.2lf";
+    push @options, "PRINT:USHSW_MAX:%4.2lf";
     
     @values = RRDs::graph("${report_dir}/cpu.png", @options);
     
@@ -707,35 +847,35 @@ sub create_graph {
         push @options, "STACK:WAI#${colors[4]}:wait";
         
         push @options, "VDEF:U_MIN=USR,MINIMUM";
-        push @options, "PRINT:U_MIN:%3.2lf";
+        push @options, "PRINT:U_MIN:%4.2lf";
         push @options, "VDEF:U_AVG=USR,AVERAGE";
-        push @options, "PRINT:U_AVG:%3.2lf";
+        push @options, "PRINT:U_AVG:%4.2lf";
         push @options, "VDEF:U_MAX=USR,MAXIMUM";
-        push @options, "PRINT:U_MAX:%3.2lf";
+        push @options, "PRINT:U_MAX:%4.2lf";
         
         push @options, "CDEF:US=USR,SYS,+";
         push @options, "VDEF:US_MIN=US,MINIMUM";
-        push @options, "PRINT:US_MIN:%3.2lf";
+        push @options, "PRINT:US_MIN:%4.2lf";
         push @options, "VDEF:US_AVG=US,AVERAGE";
-        push @options, "PRINT:US_AVG:%3.2lf";
+        push @options, "PRINT:US_AVG:%4.2lf";
         push @options, "VDEF:US_MAX=US,MAXIMUM";
-        push @options, "PRINT:US_MAX:%3.2lf";
+        push @options, "PRINT:US_MAX:%4.2lf";
         
         push @options, "CDEF:USHS=USR,SYS,+,HIQ,+,SIQ,+";
         push @options, "VDEF:USHS_MIN=USHS,MINIMUM";
-        push @options, "PRINT:USHS_MIN:%3.2lf";
+        push @options, "PRINT:USHS_MIN:%4.2lf";
         push @options, "VDEF:USHS_AVG=USHS,AVERAGE";
-        push @options, "PRINT:USHS_AVG:%3.2lf";
+        push @options, "PRINT:USHS_AVG:%4.2lf";
         push @options, "VDEF:USHS_MAX=USHS,MAXIMUM";
-        push @options, "PRINT:USHS_MAX:%3.2lf";
+        push @options, "PRINT:USHS_MAX:%4.2lf";
         
         push @options, "CDEF:USHSW=USR,SYS,+,HIQ,+,SIQ,+,WAI,+";
         push @options, "VDEF:USHSW_MIN=USHSW,MINIMUM";
-        push @options, "PRINT:USHSW_MIN:%3.2lf";
+        push @options, "PRINT:USHSW_MIN:%4.2lf";
         push @options, "VDEF:USHSW_AVG=USHSW,AVERAGE";
-        push @options, "PRINT:USHSW_AVG:%3.2lf";
+        push @options, "PRINT:USHSW_AVG:%4.2lf";
         push @options, "VDEF:USHSW_MAX=USHSW,MAXIMUM";
-        push @options, "PRINT:USHSW_MAX:%3.2lf";
+        push @options, "PRINT:USHSW_MAX:%4.2lf";
         
         @values = RRDs::graph("${report_dir}/cpu${cpu}.png", @options);
         
@@ -778,12 +918,33 @@ sub create_graph {
     push @options, "DEF:SEND=${rrd_file}:NET_SEND:AVERAGE";
     push @options, "LINE1:SEND#${colors[1]}:send";
     
-    RRDs::graph("${report_dir}/net.png", @options);
+    push @options, "VDEF:R_MIN=RECV,MINIMUM";
+    push @options, "PRINT:R_MIN:%4.2lf %s";
+    push @options, "VDEF:R_AVG=RECV,AVERAGE";
+    push @options, "PRINT:R_AVG:%4.2lf %s";
+    push @options, "VDEF:R_MAX=RECV,MAXIMUM";
+    push @options, "PRINT:R_MAX:%4.2lf %s";
+    
+    push @options, "VDEF:S_MIN=SEND,MINIMUM";
+    push @options, "PRINT:S_MIN:%4.2lf %s";
+    push @options, "VDEF:S_AVG=SEND,AVERAGE";
+    push @options, "PRINT:S_AVG:%4.2lf %s";
+    push @options, "VDEF:S_MAX=SEND,MAXIMUM";
+    push @options, "PRINT:S_MAX:%4.2lf %s";
+    
+    @values = RRDs::graph("${report_dir}/net.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
+    
+    $value{'NET'}->{'R_MIN'} = $values[0]->[0];
+    $value{'NET'}->{'R_AVG'} = $values[0]->[1];
+    $value{'NET'}->{'R_MAX'} = $values[0]->[2];
+    $value{'NET'}->{'S_MIN'} = $values[0]->[3];
+    $value{'NET'}->{'S_AVG'} = $values[0]->[4];
+    $value{'NET'}->{'S_MAX'} = $values[0]->[5];
     
     # Network individual
     foreach my $net (sort keys %index_net) {
@@ -806,12 +967,33 @@ sub create_graph {
         push @options, "DEF:SEND=${rrd_file}:NET_${net}_SEND:AVERAGE";
         push @options, "LINE1:SEND#${colors[1]}:send";
         
-        RRDs::graph("${report_dir}/net_${net}.png", @options);
+        push @options, "VDEF:R_MIN=RECV,MINIMUM";
+        push @options, "PRINT:R_MIN:%4.2lf %s";
+        push @options, "VDEF:R_AVG=RECV,AVERAGE";
+        push @options, "PRINT:R_AVG:%4.2lf %s";
+        push @options, "VDEF:R_MAX=RECV,MAXIMUM";
+        push @options, "PRINT:R_MAX:%4.2lf %s";
+        
+        push @options, "VDEF:S_MIN=SEND,MINIMUM";
+        push @options, "PRINT:S_MIN:%4.2lf %s";
+        push @options, "VDEF:S_AVG=SEND,AVERAGE";
+        push @options, "PRINT:S_AVG:%4.2lf %s";
+        push @options, "VDEF:S_MAX=SEND,MAXIMUM";
+        push @options, "PRINT:S_MAX:%4.2lf %s";
+        
+        @values = RRDs::graph("${report_dir}/net_${net}.png", @options);
         
         if (my $error = RRDs::error) {
             &delete_rrd();
             die $error;
         }
+        
+        $value{"NET_${net}"}->{'R_MIN'} = $values[0]->[0];
+        $value{"NET_${net}"}->{'R_AVG'} = $values[0]->[1];
+        $value{"NET_${net}"}->{'R_MAX'} = $values[0]->[2];
+        $value{"NET_${net}"}->{'S_MIN'} = $values[0]->[3];
+        $value{"NET_${net}"}->{'S_AVG'} = $values[0]->[4];
+        $value{"NET_${net}"}->{'S_MAX'} = $values[0]->[5];
     }
 }
 
@@ -919,29 +1101,179 @@ _EOF_
           <h2>Processes</h2>
           <h3 id="procs_run">Processes running</h3>
           <p><img src="procs_run.png" alt="Processes running" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Processes running</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>running</td>
+                <td class="number">$value{'PROCS_RUN'}->{'MIN'}</td>
+                <td class="number">$value{'PROCS_RUN'}->{'AVG'}</td>
+                <td class="number">$value{'PROCS_RUN'}->{'MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
           <h3 id="procs_blk">Processes blocked</h3>
           <p><img src="procs_blk.png" alt="Processes blocked" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Processes blocked</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>blocked</td>
+                <td class="number">$value{'PROCS_BLK'}->{'MIN'}</td>
+                <td class="number">$value{'PROCS_BLK'}->{'AVG'}</td>
+                <td class="number">$value{'PROCS_BLK'}->{'MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
           <h3 id="procs_new">Processes new</h3>
           <p><img src="procs_new.png" alt="Processes new" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Processes new</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>new</td>
+                <td class="number">$value{'PROCS_NEW'}->{'MIN'}</td>
+                <td class="number">$value{'PROCS_NEW'}->{'AVG'}</td>
+                <td class="number">$value{'PROCS_NEW'}->{'MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
           <hr />
           <h2>Memory Usage</h2>
           <h3 id="memory">Memory Usage</h3>
           <p><img src="memory.png" alt="Memory Usage" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Memory Usage</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>used</td>
+                <td class="number">$value{'MEMORY'}->{'U_MIN'}</td>
+                <td class="number">$value{'MEMORY'}->{'U_AVG'}</td>
+                <td class="number">$value{'MEMORY'}->{'U_MAX'}</td>
+              </tr>
+              <tr>
+                <td>used+buffer+cached</td>
+                <td class="number">$value{'MEMORY'}->{'UBC_MIN'}</td>
+                <td class="number">$value{'MEMORY'}->{'UBC_AVG'}</td>
+                <td class="number">$value{'MEMORY'}->{'UBC_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
           <hr />
           <h2>Paging</h2>
           <h3 id="paging">Paging</h3>
           <p><img src="paging.png" alt="Paging" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Paging</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>page_in</td>
+                <td class="number">$value{'PAGE'}->{'I_MIN'}</td>
+                <td class="number">$value{'PAGE'}->{'I_AVG'}</td>
+                <td class="number">$value{'PAGE'}->{'I_MAX'}</td>
+              </tr>
+              <tr>
+                <td>page_out</td>
+                <td class="number">$value{'PAGE'}->{'O_MIN'}</td>
+                <td class="number">$value{'PAGE'}->{'O_AVG'}</td>
+                <td class="number">$value{'PAGE'}->{'O_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
           <hr />
           <h2>Disk I/O</h2>
           <h3 id="disk">Disk I/O total</h3>
           <p><img src="disk.png" alt="Disk I/O total" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Disk I/O total</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>read</td>
+                <td class="number">$value{'DISK'}->{'R_MIN'}</td>
+                <td class="number">$value{'DISK'}->{'R_AVG'}</td>
+                <td class="number">$value{'DISK'}->{'R_MAX'}</td>
+              </tr>
+              <tr>
+                <td>write</td>
+                <td class="number">$value{'DISK'}->{'W_MIN'}</td>
+                <td class="number">$value{'DISK'}->{'W_AVG'}</td>
+                <td class="number">$value{'DISK'}->{'W_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
 _EOF_
     
     foreach my $disk (sort keys %index_disk) {
-        print $fh ' ' x 10;
-        print $fh "<h3 id=\"disk_${disk}\">Disk I/O ${disk}</h3>\n";
-        print $fh ' ' x 10;
-        print $fh "<p><img src=\"disk_${disk}.png\" alt=\"Disk I/O ${disk}\"></p>\n";
+        print $fh <<_EOF_;
+          <h3 id="disk_${disk}">Disk I/O ${disk}</h3>
+          <p><img src="disk_${disk}.png" alt="Disk I/O ${disk}"></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Disk I/O ${disk}</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>read</td>
+                <td class="number">$value{"DISK_${disk}"}->{'R_MIN'}</td>
+                <td class="number">$value{"DISK_${disk}"}->{'R_AVG'}</td>
+                <td class="number">$value{"DISK_${disk}"}->{'R_MAX'}</td>
+              </tr>
+              <tr>
+                <td>write</td>
+                <td class="number">$value{"DISK_${disk}"}->{'W_MIN'}</td>
+                <td class="number">$value{"DISK_${disk}"}->{'W_AVG'}</td>
+                <td class="number">$value{"DISK_${disk}"}->{'W_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
+_EOF_
     }
     
     print $fh <<_EOF_;
@@ -949,8 +1281,44 @@ _EOF_
           <h2>System</h2>
           <h3 id="interrupts">Interrupts</h3>
           <p><img src="interrupts.png" alt="Interrupts" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Interrupts</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>interrupts</td>
+                <td class="number">$value{'INTERRUPTS'}->{'MIN'}</td>
+                <td class="number">$value{'INTERRUPTS'}->{'AVG'}</td>
+                <td class="number">$value{'INTERRUPTS'}->{'MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
           <h3 id="cswitches">Context Switches</h3>
           <p><img src="cswitches.png" alt="Context Switches" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Context Switches</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>context_switches</td>
+                <td class="number">$value{'CSWITCHES'}->{'MIN'}</td>
+                <td class="number">$value{'CSWITCHES'}->{'AVG'}</td>
+                <td class="number">$value{'CSWITCHES'}->{'MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
           <hr />
           <h2>CPU Usage</h2>
           <h3 id="cpu">CPU Usage total</h3>
@@ -958,7 +1326,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">CPU Usage</th>
+                <th class="header">CPU Usage total</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1000,7 +1368,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">CPU Usage</th>
+                <th class="header">CPU Usage cpu${cpu}</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1041,13 +1409,61 @@ _EOF_
           <h2>Network I/O</h2>
           <h3 id="net">Network I/O total</h3>
           <p><img src="net.png" alt="Network I/O total" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Network I/O total</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>receive</td>
+                <td class="number">$value{'NET'}->{'R_MIN'}</td>
+                <td class="number">$value{'NET'}->{'R_AVG'}</td>
+                <td class="number">$value{'NET'}->{'R_MAX'}</td>
+              </tr>
+              <tr>
+                <td>send</td>
+                <td class="number">$value{'NET'}->{'S_MIN'}</td>
+                <td class="number">$value{'NET'}->{'S_AVG'}</td>
+                <td class="number">$value{'NET'}->{'S_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
 _EOF_
     
     foreach my $net (sort keys %index_net) {
-        print $fh ' ' x 10;
-        print $fh "<h3 id=\"net_${net}\">Network I/O ${net}</h3>\n";
-        print $fh ' ' x 10;
-        print $fh "<p><img src=\"net_${net}.png\" alt=\"Network I/O ${net}\" /></p>\n";
+        print $fh <<_EOF_;
+          <h3 id="net_${net}">Network I/O ${net}</h3>
+          <p><img src="net_${net}.png" alt="Network I/O ${net}" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Network I/O ${net}</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>receive</td>
+                <td class="number">$value{"NET_${net}"}->{'R_MIN'}</td>
+                <td class="number">$value{"NET_${net}"}->{'R_AVG'}</td>
+                <td class="number">$value{"NET_${net}"}->{'R_MAX'}</td>
+              </tr>
+              <tr>
+                <td>send</td>
+                <td class="number">$value{"NET_${net}"}->{'S_MIN'}</td>
+                <td class="number">$value{"NET_${net}"}->{'S_AVG'}</td>
+                <td class="number">$value{"NET_${net}"}->{'S_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
+_EOF_
     }
     
     print $fh <<_EOF_;
