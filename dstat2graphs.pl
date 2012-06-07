@@ -1144,7 +1144,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Processes new</th>
+                <th class="header">Processes new (/sec)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1166,7 +1166,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Memory Usage</th>
+                <th class="header">Memory Usage (Bytes)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1194,7 +1194,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Paging</th>
+                <th class="header">Paging (Bytes/sec)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1222,7 +1222,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Disk I/O total</th>
+                <th class="header">Disk I/O total (Bytes/sec)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1252,7 +1252,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Disk I/O ${disk}</th>
+                <th class="header">Disk I/O ${disk} (Bytes/sec)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1284,7 +1284,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Interrupts</th>
+                <th class="header">Interrupts (/sec)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1304,7 +1304,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Context Switches</th>
+                <th class="header">Context Switches (/sec)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1326,7 +1326,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">CPU Usage total</th>
+                <th class="header">CPU Usage total (%)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1368,7 +1368,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">CPU Usage cpu${cpu}</th>
+                <th class="header">CPU Usage cpu${cpu} (%)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1412,7 +1412,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Network I/O total</th>
+                <th class="header">Network I/O total (Bytes/sec)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1442,7 +1442,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Network I/O ${net}</th>
+                <th class="header">Network I/O ${net} (Bytes/sec)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
