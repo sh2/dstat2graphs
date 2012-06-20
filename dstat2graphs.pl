@@ -415,7 +415,7 @@ sub create_graph {
     push @options, "AREA:RUN#${colors[0]}:running";
     
     push @options, "CDEF:RUN_AVG=RUN,${window},TREND";
-    push @options, "LINE1:RUN_AVG#${colors[1]}:running_${window}sec";
+    push @options, "LINE1:RUN_AVG#${colors[1]}:running_${window}secs";
     
     push @options, "VDEF:MIN=RUN,MINIMUM";
     push @options, "PRINT:MIN:%4.2lf";
@@ -445,7 +445,7 @@ sub create_graph {
     push @options, "AREA:BLK#${colors[0]}:blocked";
     
     push @options, "CDEF:BLK_AVG=BLK,${window},TREND";
-    push @options, "LINE1:BLK_AVG#${colors[1]}:blocked_${window}sec";
+    push @options, "LINE1:BLK_AVG#${colors[1]}:blocked_${window}secs";
     
     push @options, "VDEF:MIN=BLK,MINIMUM";
     push @options, "PRINT:MIN:%4.2lf";
@@ -475,7 +475,7 @@ sub create_graph {
     push @options, "AREA:NEW#${colors[0]}:new";
     
     push @options, "CDEF:NEW_AVG=NEW,${window},TREND";
-    push @options, "LINE1:NEW_AVG#${colors[1]}:new_${window}sec";
+    push @options, "LINE1:NEW_AVG#${colors[1]}:new_${window}secs";
     
     push @options, "VDEF:MIN=NEW,MINIMUM";
     push @options, "PRINT:MIN:%4.2lf";
@@ -696,7 +696,7 @@ sub create_graph {
     push @options, "AREA:INT#${colors[0]}:interrupts";
     
     push @options, "CDEF:INT_AVG=INT,${window},TREND";
-    push @options, "LINE1:INT_AVG#${colors[1]}:interrupts_${window}sec";
+    push @options, "LINE1:INT_AVG#${colors[1]}:interrupts_${window}secs";
     
     push @options, "VDEF:MIN=INT,MINIMUM";
     push @options, "PRINT:MIN:%4.2lf";
@@ -726,7 +726,7 @@ sub create_graph {
     push @options, "AREA:CSW#${colors[0]}:context_switches";
     
     push @options, "CDEF:CSW_AVG=CSW,${window},TREND";
-    push @options, "LINE1:CSW_AVG#${colors[1]}:context_switches_${window}sec";
+    push @options, "LINE1:CSW_AVG#${colors[1]}:context_switches_${window}secs";
     
     push @options, "VDEF:MIN=CSW,MINIMUM";
     push @options, "PRINT:MIN:%4.2lf";
@@ -1094,7 +1094,7 @@ _EOF_
             <ul>
               <li>Hostname: ${hostname_enc}</li>
               <li>Datetime: ${datetime}</li>
-              <li>Duration: ${duration} (seconds)</li>
+              <li>Duration: ${duration} (secs)</li>
             </ul>
           </div>
           <p><a href="d_${report_suffix}.zip">Download a Zip file</a></p>
