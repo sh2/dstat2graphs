@@ -15,10 +15,10 @@ Red Hat Enterprise Linux 5の場合はEPELリポジトリから入手してく�
 
     # yum install rrdtool rrdtool-perl
 
-PerlのArchive::Zipモジュールも必要ですので、
+PerlのArchive::ZipとHTML::Entitiesモジュールも必要ですので、
 以下のようにしてインストールしてください。
 
-    # yum install perl-Archive-Zip
+    # yum install perl-Archive-Zip perl-HTML-Parser
 
 本ツールは作業ディレクトリとして/dev/shmを利用します。
 以下のようにして作業ディレクトリを作成してください。
