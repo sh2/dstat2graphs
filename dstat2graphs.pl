@@ -35,7 +35,7 @@ my @colors = (
     );
 
 my $epoch = 978274800; # 2001/01/01 00:00:00
-my $top_dir = '..';
+my $top_dir = '../..';
 my $rrd_file = '/dev/shm/dstat2graphs/' . &random_str() . '.rrd';
 
 my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net, %value);
@@ -1471,10 +1471,10 @@ _EOF_
       </div>
       <hr />
       <div class="footer">
-        (c) 2012, Sadao Hiratsuka.
+        (c) 2012-2014, Sadao Hiratsuka.
       </div>
     </div>
-    <script src="${top_dir}/js/jquery-1.7.2.min.js"></script>
+    <script src="${top_dir}/js/jquery-1.11.0.min.js"></script>
     <script src="${top_dir}/js/bootstrap.min.js"></script>
   </body>
 </html>
