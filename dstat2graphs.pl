@@ -622,7 +622,7 @@ sub create_graph {
     push @options, "VDEF:W_MAX=WRIT,MAXIMUM";
     push @options, "PRINT:W_MAX:%4.2lf %s";
     
-    @values = RRDs::graph("${report_dir}/disk.png", @options);
+    @values = RRDs::graph("${report_dir}/disk_rw.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
@@ -635,6 +635,60 @@ sub create_graph {
     $value{'DISK'}->{'W_MIN'} = $values[0]->[3];
     $value{'DISK'}->{'W_AVG'} = $values[0]->[4];
     $value{'DISK'}->{'W_MAX'} = $values[0]->[5];
+    
+    # read
+    @options = @template;
+    
+    if ($disk_limit != 0) {
+        push @options, '--upper-limit';
+        push @options, $disk_limit;
+    }
+    
+    push @options, '--base';
+    push @options, 1024;
+    
+    push @options, '--title';
+    push @options, 'Disk I/O total read (Bytes/sec)';
+    
+    push @options, "DEF:READ=${rrd_file}:DISK_READ:AVERAGE";
+    push @options, "AREA:READ#${colors[0]}:read";
+    
+    push @options, "CDEF:READ_AVG=READ,${window},TREND";
+    push @options, "LINE1:READ_AVG#${colors[1]}:read_${window}secs";
+    
+    RRDs::graph("${report_dir}/disk_r.png", @options);
+    
+    if (my $error = RRDs::error) {
+        &delete_rrd();
+        die $error;
+    }
+    
+    # write
+    @options = @template;
+    
+    if ($disk_limit != 0) {
+        push @options, '--upper-limit';
+        push @options, $disk_limit;
+    }
+    
+    push @options, '--base';
+    push @options, 1024;
+    
+    push @options, '--title';
+    push @options, 'Disk I/O total write (Bytes/sec)';
+    
+    push @options, "DEF:WRIT=${rrd_file}:DISK_WRIT:AVERAGE";
+    push @options, "AREA:WRIT#${colors[0]}:write";
+    
+    push @options, "CDEF:WRIT_AVG=WRIT,${window},TREND";
+    push @options, "LINE1:WRIT_AVG#${colors[1]}:write_${window}secs";
+    
+    RRDs::graph("${report_dir}/disk_w.png", @options);
+    
+    if (my $error = RRDs::error) {
+        &delete_rrd();
+        die $error;
+    }
     
     # Disk individual
     foreach my $disk (sort keys %index_disk) {
@@ -671,7 +725,7 @@ sub create_graph {
         push @options, "VDEF:W_MAX=WRIT,MAXIMUM";
         push @options, "PRINT:W_MAX:%4.2lf %s";
         
-        @values = RRDs::graph("${report_dir}/disk_${disk}.png", @options);
+        @values = RRDs::graph("${report_dir}/disk_${disk}_rw.png", @options);
         
         if (my $error = RRDs::error) {
             &delete_rrd();
@@ -684,6 +738,60 @@ sub create_graph {
         $value{"DISK_${disk}"}->{'W_MIN'} = $values[0]->[3];
         $value{"DISK_${disk}"}->{'W_AVG'} = $values[0]->[4];
         $value{"DISK_${disk}"}->{'W_MAX'} = $values[0]->[5];
+        
+        # read
+        @options = @template;
+        
+        if ($disk_limit != 0) {
+            push @options, '--upper-limit';
+            push @options, $disk_limit;
+        }
+        
+        push @options, '--base';
+        push @options, 1024;
+        
+        push @options, '--title';
+        push @options, "Disk I/O ${disk} read (Bytes/sec)";
+        
+        push @options, "DEF:READ=${rrd_file}:DISK_${disk}_READ:AVERAGE";
+        push @options, "AREA:READ#${colors[0]}:read";
+        
+        push @options, "CDEF:READ_AVG=READ,${window},TREND";
+        push @options, "LINE1:READ_AVG#${colors[1]}:read_${window}secs";
+        
+        RRDs::graph("${report_dir}/disk_${disk}_r.png", @options);
+        
+        if (my $error = RRDs::error) {
+            &delete_rrd();
+            die $error;
+        }
+        
+        # write
+        @options = @template;
+        
+        if ($disk_limit != 0) {
+            push @options, '--upper-limit';
+            push @options, $disk_limit;
+        }
+        
+        push @options, '--base';
+        push @options, 1024;
+        
+        push @options, '--title';
+        push @options, "Disk I/O ${disk} write (Bytes/sec)";
+        
+        push @options, "DEF:WRIT=${rrd_file}:DISK_${disk}_WRIT:AVERAGE";
+        push @options, "AREA:WRIT#${colors[0]}:write";
+        
+        push @options, "CDEF:WRIT_AVG=WRIT,${window},TREND";
+        push @options, "LINE1:WRIT_AVG#${colors[1]}:write_${window}secs";
+        
+        RRDs::graph("${report_dir}/disk_${disk}_w.png", @options);
+        
+        if (my $error = RRDs::error) {
+            &delete_rrd();
+            die $error;
+        }
     }
     
     # Interrupts
@@ -932,7 +1040,7 @@ sub create_graph {
     push @options, "VDEF:S_MAX=SEND,MAXIMUM";
     push @options, "PRINT:S_MAX:%4.2lf %s";
     
-    @values = RRDs::graph("${report_dir}/net.png", @options);
+    @values = RRDs::graph("${report_dir}/net_rs.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
@@ -945,6 +1053,60 @@ sub create_graph {
     $value{'NET'}->{'S_MIN'} = $values[0]->[3];
     $value{'NET'}->{'S_AVG'} = $values[0]->[4];
     $value{'NET'}->{'S_MAX'} = $values[0]->[5];
+    
+    # receive
+    @options = @template;
+    
+    if ($net_limit != 0) {
+        push @options, '--upper-limit';
+        push @options, $net_limit;
+    }
+    
+    push @options, '--base';
+    push @options, 1024;
+    
+    push @options, '--title';
+    push @options, 'Network I/O total receive (Bytes/sec)';
+    
+    push @options, "DEF:RECV=${rrd_file}:NET_RECV:AVERAGE";
+    push @options, "AREA:RECV#${colors[0]}:receive";
+    
+    push @options, "CDEF:RECV_AVG=RECV,${window},TREND";
+    push @options, "LINE1:RECV_AVG#${colors[1]}:receive_${window}secs";
+    
+    RRDs::graph("${report_dir}/net_r.png", @options);
+    
+    if (my $error = RRDs::error) {
+        &delete_rrd();
+        die $error;
+    }
+    
+    # send
+    @options = @template;
+    
+    if ($net_limit != 0) {
+        push @options, '--upper-limit';
+        push @options, $net_limit;
+    }
+    
+    push @options, '--base';
+    push @options, 1024;
+    
+    push @options, '--title';
+    push @options, 'Network I/O total send (Bytes/sec)';
+    
+    push @options, "DEF:SEND=${rrd_file}:NET_SEND:AVERAGE";
+    push @options, "AREA:SEND#${colors[0]}:send";
+    
+    push @options, "CDEF:SEND_AVG=SEND,${window},TREND";
+    push @options, "LINE1:SEND_AVG#${colors[1]}:send_${window}secs";
+    
+    RRDs::graph("${report_dir}/net_s.png", @options);
+    
+    if (my $error = RRDs::error) {
+        &delete_rrd();
+        die $error;
+    }
     
     # Network individual
     foreach my $net (sort keys %index_net) {
@@ -981,7 +1143,7 @@ sub create_graph {
         push @options, "VDEF:S_MAX=SEND,MAXIMUM";
         push @options, "PRINT:S_MAX:%4.2lf %s";
         
-        @values = RRDs::graph("${report_dir}/net_${net}.png", @options);
+        @values = RRDs::graph("${report_dir}/net_${net}_rs.png", @options);
         
         if (my $error = RRDs::error) {
             &delete_rrd();
@@ -994,6 +1156,60 @@ sub create_graph {
         $value{"NET_${net}"}->{'S_MIN'} = $values[0]->[3];
         $value{"NET_${net}"}->{'S_AVG'} = $values[0]->[4];
         $value{"NET_${net}"}->{'S_MAX'} = $values[0]->[5];
+        
+        # receive
+        @options = @template;
+        
+        if ($net_limit != 0) {
+            push @options, '--upper-limit';
+            push @options, $net_limit;
+        }
+        
+        push @options, '--base';
+        push @options, 1024;
+        
+        push @options, '--title';
+        push @options, "Network I/O ${net} receive (Bytes/sec)";
+        
+        push @options, "DEF:RECV=${rrd_file}:NET_${net}_RECV:AVERAGE";
+        push @options, "AREA:RECV#${colors[0]}:receive";
+        
+        push @options, "CDEF:RECV_AVG=RECV,${window},TREND";
+        push @options, "LINE1:RECV_AVG#${colors[1]}:receive_${window}secs";
+        
+        RRDs::graph("${report_dir}/net_${net}_r.png", @options);
+        
+        if (my $error = RRDs::error) {
+            &delete_rrd();
+            die $error;
+        }
+        
+        # send
+        @options = @template;
+        
+        if ($net_limit != 0) {
+            push @options, '--upper-limit';
+            push @options, $net_limit;
+        }
+        
+        push @options, '--base';
+        push @options, 1024;
+        
+        push @options, '--title';
+        push @options, "Network I/O ${net} send (Bytes/sec)";
+        
+        push @options, "DEF:SEND=${rrd_file}:NET_${net}_SEND:AVERAGE";
+        push @options, "AREA:SEND#${colors[0]}:send";
+        
+        push @options, "CDEF:SEND_AVG=SEND,${window},TREND";
+        push @options, "LINE1:SEND_AVG#${colors[1]}:send_${window}secs";
+        
+        RRDs::graph("${report_dir}/net_${net}_s.png", @options);
+        
+        if (my $error = RRDs::error) {
+            &delete_rrd();
+            die $error;
+        }
     }
 }
 
@@ -1218,7 +1434,9 @@ _EOF_
           <hr />
           <h2>Disk I/O</h2>
           <h3 id="disk">Disk I/O total</h3>
-          <p><img src="disk.png" alt="Disk I/O total" /></p>
+          <p><img src="disk_rw.png" alt="Disk I/O total" /></p>
+          <p><img src="disk_r.png" alt="Disk I/O total read" /></p>
+          <p><img src="disk_w.png" alt="Disk I/O total write" /></p>
           <table class="table table-condensed">
             <thead>
               <tr>
@@ -1248,7 +1466,9 @@ _EOF_
     foreach my $disk (sort keys %index_disk) {
         print $fh <<_EOF_;
           <h3 id="disk_${disk}">Disk I/O ${disk}</h3>
-          <p><img src="disk_${disk}.png" alt="Disk I/O ${disk}"></p>
+          <p><img src="disk_${disk}_rw.png" alt="Disk I/O ${disk}"></p>
+          <p><img src="disk_${disk}_r.png" alt="Disk I/O ${disk} read"></p>
+          <p><img src="disk_${disk}_w.png" alt="Disk I/O ${disk} write"></p>
           <table class="table table-condensed">
             <thead>
               <tr>
@@ -1408,7 +1628,9 @@ _EOF_
           <hr />
           <h2>Network I/O</h2>
           <h3 id="net">Network I/O total</h3>
-          <p><img src="net.png" alt="Network I/O total" /></p>
+          <p><img src="net_rs.png" alt="Network I/O total" /></p>
+          <p><img src="net_r.png" alt="Network I/O total receive" /></p>
+          <p><img src="net_s.png" alt="Network I/O total send" /></p>
           <table class="table table-condensed">
             <thead>
               <tr>
@@ -1438,7 +1660,9 @@ _EOF_
     foreach my $net (sort keys %index_net) {
         print $fh <<_EOF_;
           <h3 id="net_${net}">Network I/O ${net}</h3>
-          <p><img src="net_${net}.png" alt="Network I/O ${net}" /></p>
+          <p><img src="net_${net}_rs.png" alt="Network I/O ${net}" /></p>
+          <p><img src="net_${net}_r.png" alt="Network I/O ${net} receive" /></p>
+          <p><img src="net_${net}_s.png" alt="Network I/O ${net} send" /></p>
           <table class="table table-condensed">
             <thead>
               <tr>
