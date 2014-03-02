@@ -53,24 +53,41 @@
           <div class="control-group">
             <label class="control-label">Disk I/O</label>
             <div class="controls">
-              <input type="text" name="disk_limit" value="0" class="span2 validate-limit" /> (Bytes/second)
+              <input type="text" name="disk_limit" value="0" class="span2 validate-natural" /> (Bytes/second)
               <span class="help-inline"></span>
             </div>
           </div>
           <div class="control-group">
             <label class="control-label">Network I/O</label>
             <div class="controls">
-              <input type="text" name="net_limit" value="0" class="span2 validate-limit" /> (Bytes/second)
+              <input type="text" name="net_limit" value="0" class="span2 validate-natural" /> (Bytes/second)
+              <span class="help-inline"></span>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Time Range</legend>
+          <div class="control-group">
+            <label class="control-label">Offset</label>
+            <div class="controls">
+              <input type="text" name="offset" value="0" class="span1 validate-natural" /> (seconds)
               <span class="help-inline"></span>
             </div>
           </div>
           <div class="control-group">
+            <label class="control-label">Duration</label>
             <div class="controls">
-              <input type="submit" value="Upload" class="btn span3" />
-              <input type="reset" value="Reset" class="btn span2" />
+              <input type="text" name="duration" value="0" class="span1 validate-natural" /> (seconds)
+              <span class="help-inline"></span>
             </div>
           </div>
         </fieldset>
+        <div class="control-group">
+          <div class="controls">
+            <input type="submit" value="Upload" class="btn span3" />
+            <input type="reset" value="Reset" class="btn span2" />
+          </div>
+        </div>
       </form>
       <hr />
       <div class="footer">
@@ -108,7 +125,7 @@
                 help.text('Please enter a value between 64 and 1024.');
                 isValid = false;
               }
-            } else if ($(this).hasClass('validate-limit')) {
+            } else if ($(this).hasClass('validate-natural')) {
               if (!value.match(/^-?\d+$/) || (value < 0)) {
                 control.addClass('error');
                 help.text('Please enter a value greater than or equal to 0.');

@@ -33,10 +33,12 @@ $width      = validate_number($_POST['width'], 64, 1024, 512);
 $height     = validate_number($_POST['height'], 64, 1024, 192);
 $disk_limit = validate_number($_POST['disk_limit'], 0, PHP_INT_MAX, 0);
 $net_limit  = validate_number($_POST['net_limit'], 0, PHP_INT_MAX, 0);
+$offset     = validate_number($_POST['offset'], 0, PHP_INT_MAX, 0);
+$duration   = validate_number($_POST['duration'], 0, PHP_INT_MAX, 0);
 $message    = '';
 
 if (is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
-    exec("perl dstat2graphs.pl {$csv_file} {$report_dir} {$width} {$height} {$disk_limit} {$net_limit} 2>&1",
+    exec("perl dstat2graphs.pl {$csv_file} {$report_dir} {$width} {$height} {$disk_limit} {$net_limit} {$offset} {$duration} 2>&1",
         $output, $return_var);
     
     if ($return_var == 0) {

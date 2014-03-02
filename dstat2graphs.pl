@@ -11,8 +11,8 @@ use RRDs;
 use Text::ParseWords;
 use Time::Local;
 
-if ($#ARGV != 5) {
-    die 'Usage: perl dstat2graph.pl csv_file report_dir width height disk_limit net_limit';
+if ($#ARGV != 7) {
+    die 'Usage: perl dstat2graph.pl csv_file report_dir width height disk_limit net_limit offset duration';
 }
 
 my $csv_file   = $ARGV[0];
@@ -21,6 +21,8 @@ my $width      = $ARGV[2];
 my $height     = $ARGV[3];
 my $disk_limit = $ARGV[4];
 my $net_limit  = $ARGV[5];
+my $offset     = $ARGV[6];
+my $duration   = $ARGV[7];
 
 my @colors = (
     '008FFF', 'FF00BF', 'BFBF00', 'BF00FF',
@@ -51,6 +53,7 @@ my ($start_time, $end_time, $memory_size) = (0, 0, 0);
 &create_zip();
 
 sub load_csv {
+    my $csv_start_time = 0;
     open(my $fh, '<', "${csv_file}") or die $!;
     
     while (my $line = <$fh>) {
@@ -109,8 +112,9 @@ sub load_csv {
             # Body
             my ($disk_read, $disk_writ, $net_recv, $net_send) = (0, 0, 0, 0);
             my @cols = parse_line(',', 0, $line);
+            my $unixtime = &get_unixtime($year, $cols[0]);
             
-            if ($start_time == 0) {
+            if ($csv_start_time == 0) {
                 if (!defined($hostname)) {
                     die 'It is not a dstat CSV file. No \'Host:\' column found.';
                 }
@@ -131,10 +135,16 @@ sub load_csv {
                     die 'It is not a dstat CSV file. No \'net/*\' columns found.';
                 }
                 
-                $start_time = &get_unixtime($year, $cols[0]);
+                $csv_start_time = $unixtime;
             }
             
-            my $unixtime = &get_unixtime($year, $cols[0]);
+            if ($unixtime < $csv_start_time + $offset) {
+                next;
+            }
+            
+            if ($start_time == 0) {
+                $start_time = $unixtime;
+            }
             
             if ($unixtime <= $end_time) {
                 next;
@@ -146,9 +156,18 @@ sub load_csv {
             if ($memory_size < $cols[4] + $cols[5] + $cols[6] + $cols[7]) {
                 $memory_size = $cols[4] + $cols[5] + $cols[6] + $cols[7];
             }
+            
+            if (($duration > 0) and ($start_time + $duration <= $end_time)) {
+                last;
+            }
         }
     }
+    
     close($fh);
+    
+    if (($offset > 0) and ($#data == -1)) {
+        die 'Offset is too large.';
+    }
 }
 
 sub create_rrd {
@@ -1218,13 +1237,13 @@ sub delete_rrd {
 }
 
 sub create_html {
-    my $hostname_enc = encode_entities($hostname);
+    my $report_hostname = encode_entities($hostname);
     my ($sec, $min, $hour, $mday, $mon, $year) = localtime($start_time);
     
-    my $datetime = sprintf("%04d/%02d/%02d %02d:%02d:%02d",
+    my $report_datetime = sprintf("%04d/%02d/%02d %02d:%02d:%02d",
         $year + 1900, $mon + 1, $mday, $hour, $min, $sec); 
-        
-    my $duration = $end_time - $start_time;
+    
+    my $report_duration = $end_time - $start_time;
     my ($report_suffix) = $report_dir =~ /([^\/]+)\/*$/;
     
     open(my $fh, '>', "${report_dir}/index.html") or die $!;
@@ -1233,7 +1252,7 @@ sub create_html {
 <!DOCTYPE html>
 <html>
   <head>
-    <title>${hostname_enc} ${datetime} - dstat2graphs</title>
+    <title>${report_hostname} ${report_datetime} - dstat2graphs</title>
     <link href="${top_dir}/css/bootstrap.min.css" rel="stylesheet" />
     <style type="text/css">
       body {
@@ -1308,9 +1327,9 @@ _EOF_
           <div class="hero-unit">
             <h1>dstat2graphs</h1>
             <ul>
-              <li>Hostname: ${hostname_enc}</li>
-              <li>Datetime: ${datetime}</li>
-              <li>Duration: ${duration} (Seconds)</li>
+              <li>Hostname: ${report_hostname}</li>
+              <li>Datetime: ${report_datetime}</li>
+              <li>Duration: ${report_duration} (Seconds)</li>
             </ul>
           </div>
           <p><a href="d_${report_suffix}.zip">Download a Zip file</a></p>
