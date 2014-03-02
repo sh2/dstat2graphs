@@ -415,7 +415,7 @@ sub create_graph {
     push @options, "AREA:RUN#${colors[0]}:running";
     
     push @options, "CDEF:RUN_AVG=RUN,${window},TREND";
-    push @options, "LINE1:RUN_AVG#${colors[1]}:running_${window}secs";
+    push @options, "LINE1:RUN_AVG#${colors[1]}:running_${window}seconds";
     
     push @options, "VDEF:MIN=RUN,MINIMUM";
     push @options, "PRINT:MIN:%4.2lf";
@@ -445,7 +445,7 @@ sub create_graph {
     push @options, "AREA:BLK#${colors[0]}:blocked";
     
     push @options, "CDEF:BLK_AVG=BLK,${window},TREND";
-    push @options, "LINE1:BLK_AVG#${colors[1]}:blocked_${window}secs";
+    push @options, "LINE1:BLK_AVG#${colors[1]}:blocked_${window}seconds";
     
     push @options, "VDEF:MIN=BLK,MINIMUM";
     push @options, "PRINT:MIN:%4.2lf";
@@ -469,13 +469,13 @@ sub create_graph {
     @options = @template;
     
     push @options, '--title';
-    push @options, 'Processes new (/sec)';
+    push @options, 'Processes new (/second)';
     
     push @options, "DEF:NEW=${rrd_file}:PROCS_NEW:AVERAGE";
     push @options, "AREA:NEW#${colors[0]}:new";
     
     push @options, "CDEF:NEW_AVG=NEW,${window},TREND";
-    push @options, "LINE1:NEW_AVG#${colors[1]}:new_${window}secs";
+    push @options, "LINE1:NEW_AVG#${colors[1]}:new_${window}seconds";
     
     push @options, "VDEF:MIN=NEW,MINIMUM";
     push @options, "PRINT:MIN:%4.2lf";
@@ -552,7 +552,7 @@ sub create_graph {
     push @options, 1024;
     
     push @options, '--title';
-    push @options, 'Paging (Bytes/sec)';
+    push @options, 'Paging (Bytes/second)';
     
     push @options, "DEF:IN=${rrd_file}:PAGE_IN:AVERAGE";
     push @options, "LINE1:IN#${colors[0]}:page_in";
@@ -600,7 +600,7 @@ sub create_graph {
     push @options, 1024;
     
     push @options, '--title';
-    push @options, 'Disk I/O total (Bytes/sec)';
+    push @options, 'Disk I/O total (Bytes/second)';
     
     push @options, "DEF:READ=${rrd_file}:DISK_READ:AVERAGE";
     push @options, "LINE1:READ#${colors[0]}:read";
@@ -648,13 +648,13 @@ sub create_graph {
     push @options, 1024;
     
     push @options, '--title';
-    push @options, 'Disk I/O total read (Bytes/sec)';
+    push @options, 'Disk I/O total read (Bytes/second)';
     
     push @options, "DEF:READ=${rrd_file}:DISK_READ:AVERAGE";
     push @options, "AREA:READ#${colors[0]}:read";
     
     push @options, "CDEF:READ_AVG=READ,${window},TREND";
-    push @options, "LINE1:READ_AVG#${colors[1]}:read_${window}secs";
+    push @options, "LINE1:READ_AVG#${colors[1]}:read_${window}seconds";
     
     RRDs::graph("${report_dir}/disk_r.png", @options);
     
@@ -675,13 +675,13 @@ sub create_graph {
     push @options, 1024;
     
     push @options, '--title';
-    push @options, 'Disk I/O total write (Bytes/sec)';
+    push @options, 'Disk I/O total write (Bytes/second)';
     
     push @options, "DEF:WRIT=${rrd_file}:DISK_WRIT:AVERAGE";
     push @options, "AREA:WRIT#${colors[0]}:write";
     
     push @options, "CDEF:WRIT_AVG=WRIT,${window},TREND";
-    push @options, "LINE1:WRIT_AVG#${colors[1]}:write_${window}secs";
+    push @options, "LINE1:WRIT_AVG#${colors[1]}:write_${window}seconds";
     
     RRDs::graph("${report_dir}/disk_w.png", @options);
     
@@ -703,7 +703,7 @@ sub create_graph {
         push @options, 1024;
         
         push @options, '--title';
-        push @options, "Disk I/O ${disk} (Bytes/sec)";
+        push @options, "Disk I/O ${disk} (Bytes/second)";
         
         push @options, "DEF:READ=${rrd_file}:DISK_${disk}_READ:AVERAGE";
         push @options, "LINE1:READ#${colors[0]}:read";
@@ -751,13 +751,13 @@ sub create_graph {
         push @options, 1024;
         
         push @options, '--title';
-        push @options, "Disk I/O ${disk} read (Bytes/sec)";
+        push @options, "Disk I/O ${disk} read (Bytes/second)";
         
         push @options, "DEF:READ=${rrd_file}:DISK_${disk}_READ:AVERAGE";
         push @options, "AREA:READ#${colors[0]}:read";
         
         push @options, "CDEF:READ_AVG=READ,${window},TREND";
-        push @options, "LINE1:READ_AVG#${colors[1]}:read_${window}secs";
+        push @options, "LINE1:READ_AVG#${colors[1]}:read_${window}seconds";
         
         RRDs::graph("${report_dir}/disk_${disk}_r.png", @options);
         
@@ -778,13 +778,13 @@ sub create_graph {
         push @options, 1024;
         
         push @options, '--title';
-        push @options, "Disk I/O ${disk} write (Bytes/sec)";
+        push @options, "Disk I/O ${disk} write (Bytes/second)";
         
         push @options, "DEF:WRIT=${rrd_file}:DISK_${disk}_WRIT:AVERAGE";
         push @options, "AREA:WRIT#${colors[0]}:write";
         
         push @options, "CDEF:WRIT_AVG=WRIT,${window},TREND";
-        push @options, "LINE1:WRIT_AVG#${colors[1]}:write_${window}secs";
+        push @options, "LINE1:WRIT_AVG#${colors[1]}:write_${window}seconds";
         
         RRDs::graph("${report_dir}/disk_${disk}_w.png", @options);
         
@@ -798,13 +798,13 @@ sub create_graph {
     @options = @template;
     
     push @options, '--title';
-    push @options, 'Interrupts (/sec)';
+    push @options, 'Interrupts (/second)';
     
     push @options, "DEF:INT=${rrd_file}:INTERRUPTS:AVERAGE";
     push @options, "AREA:INT#${colors[0]}:interrupts";
     
     push @options, "CDEF:INT_AVG=INT,${window},TREND";
-    push @options, "LINE1:INT_AVG#${colors[1]}:interrupts_${window}secs";
+    push @options, "LINE1:INT_AVG#${colors[1]}:interrupts_${window}seconds";
     
     push @options, "VDEF:MIN=INT,MINIMUM";
     push @options, "PRINT:MIN:%4.2lf";
@@ -828,13 +828,13 @@ sub create_graph {
     @options = @template;
     
     push @options, '--title';
-    push @options, 'Context Switches (/sec)';
+    push @options, 'Context Switches (/second)';
     
     push @options, "DEF:CSW=${rrd_file}:CSWITCHES:AVERAGE";
     push @options, "AREA:CSW#${colors[0]}:context_switches";
     
     push @options, "CDEF:CSW_AVG=CSW,${window},TREND";
-    push @options, "LINE1:CSW_AVG#${colors[1]}:context_switches_${window}secs";
+    push @options, "LINE1:CSW_AVG#${colors[1]}:context_switches_${window}seconds";
     
     push @options, "VDEF:MIN=CSW,MINIMUM";
     push @options, "PRINT:MIN:%4.2lf";
@@ -1018,7 +1018,7 @@ sub create_graph {
     push @options, 1024;
     
     push @options, '--title';
-    push @options, 'Network I/O total (Bytes/sec)';
+    push @options, 'Network I/O total (Bytes/second)';
     
     push @options, "DEF:RECV=${rrd_file}:NET_RECV:AVERAGE";
     push @options, "LINE1:RECV#${colors[0]}:receive";
@@ -1066,13 +1066,13 @@ sub create_graph {
     push @options, 1024;
     
     push @options, '--title';
-    push @options, 'Network I/O total receive (Bytes/sec)';
+    push @options, 'Network I/O total receive (Bytes/second)';
     
     push @options, "DEF:RECV=${rrd_file}:NET_RECV:AVERAGE";
     push @options, "AREA:RECV#${colors[0]}:receive";
     
     push @options, "CDEF:RECV_AVG=RECV,${window},TREND";
-    push @options, "LINE1:RECV_AVG#${colors[1]}:receive_${window}secs";
+    push @options, "LINE1:RECV_AVG#${colors[1]}:receive_${window}seconds";
     
     RRDs::graph("${report_dir}/net_r.png", @options);
     
@@ -1093,13 +1093,13 @@ sub create_graph {
     push @options, 1024;
     
     push @options, '--title';
-    push @options, 'Network I/O total send (Bytes/sec)';
+    push @options, 'Network I/O total send (Bytes/second)';
     
     push @options, "DEF:SEND=${rrd_file}:NET_SEND:AVERAGE";
     push @options, "AREA:SEND#${colors[0]}:send";
     
     push @options, "CDEF:SEND_AVG=SEND,${window},TREND";
-    push @options, "LINE1:SEND_AVG#${colors[1]}:send_${window}secs";
+    push @options, "LINE1:SEND_AVG#${colors[1]}:send_${window}seconds";
     
     RRDs::graph("${report_dir}/net_s.png", @options);
     
@@ -1121,7 +1121,7 @@ sub create_graph {
         push @options, 1024;
         
         push @options, '--title';
-        push @options, "Network I/O ${net} (Bytes/sec)";
+        push @options, "Network I/O ${net} (Bytes/second)";
         
         push @options, "DEF:RECV=${rrd_file}:NET_${net}_RECV:AVERAGE";
         push @options, "LINE1:RECV#${colors[0]}:receive";
@@ -1169,13 +1169,13 @@ sub create_graph {
         push @options, 1024;
         
         push @options, '--title';
-        push @options, "Network I/O ${net} receive (Bytes/sec)";
+        push @options, "Network I/O ${net} receive (Bytes/second)";
         
         push @options, "DEF:RECV=${rrd_file}:NET_${net}_RECV:AVERAGE";
         push @options, "AREA:RECV#${colors[0]}:receive";
         
         push @options, "CDEF:RECV_AVG=RECV,${window},TREND";
-        push @options, "LINE1:RECV_AVG#${colors[1]}:receive_${window}secs";
+        push @options, "LINE1:RECV_AVG#${colors[1]}:receive_${window}seconds";
         
         RRDs::graph("${report_dir}/net_${net}_r.png", @options);
         
@@ -1196,13 +1196,13 @@ sub create_graph {
         push @options, 1024;
         
         push @options, '--title';
-        push @options, "Network I/O ${net} send (Bytes/sec)";
+        push @options, "Network I/O ${net} send (Bytes/second)";
         
         push @options, "DEF:SEND=${rrd_file}:NET_${net}_SEND:AVERAGE";
         push @options, "AREA:SEND#${colors[0]}:send";
         
         push @options, "CDEF:SEND_AVG=SEND,${window},TREND";
-        push @options, "LINE1:SEND_AVG#${colors[1]}:send_${window}secs";
+        push @options, "LINE1:SEND_AVG#${colors[1]}:send_${window}seconds";
         
         RRDs::graph("${report_dir}/net_${net}_s.png", @options);
         
@@ -1310,7 +1310,7 @@ _EOF_
             <ul>
               <li>Hostname: ${hostname_enc}</li>
               <li>Datetime: ${datetime}</li>
-              <li>Duration: ${duration} (secs)</li>
+              <li>Duration: ${duration} (Seconds)</li>
             </ul>
           </div>
           <p><a href="d_${report_suffix}.zip">Download a Zip file</a></p>
@@ -1360,7 +1360,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Processes new (/sec)</th>
+                <th class="header">Processes new (/second)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1410,7 +1410,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Paging (Bytes/sec)</th>
+                <th class="header">Paging (Bytes/second)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1440,7 +1440,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Disk I/O total (Bytes/sec)</th>
+                <th class="header">Disk I/O total (Bytes/second)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1472,7 +1472,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Disk I/O ${disk} (Bytes/sec)</th>
+                <th class="header">Disk I/O ${disk} (Bytes/second)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1504,7 +1504,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Interrupts (/sec)</th>
+                <th class="header">Interrupts (/second)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1524,7 +1524,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Context Switches (/sec)</th>
+                <th class="header">Context Switches (/second)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1634,7 +1634,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Network I/O total (Bytes/sec)</th>
+                <th class="header">Network I/O total (Bytes/second)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1666,7 +1666,7 @@ _EOF_
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Network I/O ${net} (Bytes/sec)</th>
+                <th class="header">Network I/O ${net} (Bytes/second)</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
