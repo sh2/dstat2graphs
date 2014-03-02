@@ -32,7 +32,7 @@ Apatch HTTP ServerとPHPがインストールされている必要がありま�
 Apache HTTP Serverのドキュメントルート配下にスクリプトを配置してください。スクリプトを配置したディレクトリの直下にreportsディレクトリを作成し、apacheユーザが書き込みを行える状態にしてください。
 
     # mkdir <document_root>/<script_dir>/reports
-    # chmod 777 <document_root>/<script_dir>/reports
+    # chown apache:apache <document_root>/<script_dir>/reports
 
 ウェブ画面からの使い方
 ----------------------
