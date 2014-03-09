@@ -71,5 +71,10 @@ Webブラウザでhttp://&lt;server\_host&gt;/&lt;script\_dir&gt;/にアクセ�
 
 ## Perlスクリプト単体での使い方
 
-(あとで)
+Perlスクリプトdstat2graphs.plを単体で使用してグラフを描画することが可能です。作業ディレクトリ/dev/shm/dstat2graphsに対してスクリプト実行ユーザが書き込みを行える状態にしておいてください。コマンドラインオプションは以下の通りです。すべて指定する必要があります。
 
+    $ perl dstat2graph.pl csv_file report_dir width height disk_limit net_limit offset duration
+
+- report_dir グラフを出力するディレクトリを指定します。ディレクトリが存在しない場合は自動作成します。
+
+report_dir以外のオプションは、ウェブ画面から指定できるものと同じです。
