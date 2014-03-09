@@ -1,8 +1,23 @@
 # dstat2graphs
 
-dstatのCSVファイルをグラフに変換するWebアプリケーションです。以下のオプションで出力されたファイルのみ受け付けます。
+dstatのCSVファイルをもとにグラフを描画するWebアプリケーションです。以下のオプションで出力されたファイルのみを受け付けます。
 
     $ dstat -tvfn --output log.csv 1
+
+## サンプル
+
+以下のデモサイトで実際に使用できます。
+
+- [dstat2graphs - dbstudy.info](http://dbstudy.info/dstat2graphs/)
+
+出力結果のサンプルです。
+
+- [k02c5 2012/05/04 20:03:53 - dstat2graphs](http://dbstudy.info/dstat2graphs/reports/20140309-132019_rbntbQci/)
+
+デモサイトの使用に際しては、次の点に注意してください。
+
+- アップロードできるCSVファイルサイズは、4MBytesまでです。
+- アクセス制御機能はありませんので、機密性の高いデータはアップロードしないでください。
 
 ## セットアップ
 
@@ -14,9 +29,9 @@ Apatch HTTP ServerとPHPがインストールされている必要がありま�
 
 続いて以下のパッケージをインストールしてください。
 
-* perl-Archive-Zip
-* rrdtool
-* rrdtool-perl
+- perl-Archive-Zip
+- rrdtool
+- rrdtool-perl
 
 <!-- dummy comment line for breaking list -->
 
@@ -32,7 +47,7 @@ Apache HTTP Serverのドキュメントルート配下にスクリプトを配�
     # mkdir <document_root>/<script_dir>/reports
     # chown apache:apache <document_root>/<script_dir>/reports
 
-dstatのCSVファイルサイズが大きい場合、PHPで大きなファイルを扱えるようにしておく必要があります。/etc/php.iniにおいてパラメータupload\_max\_filesizeをCSVファイルサイズより大きな値に調節してください。このときmemory\_limit &gt; post\_max\_size &gt; upload\_max\_filesizeという関係を満たす必要があります。
+dstatのCSVファイルサイズが大きい場合、PHPで大きなファイルを扱えるようにしておく必要があります。/etc/php.iniにおいてパラメータupload\_max\_filesizeをCSVファイルサイズよりも大きな値に調節してください。このときmemory\_limit &gt; post\_max\_size &gt; upload\_max\_filesizeという関係を満たす必要があります。
 
     memory_limit = 128M
     post_max_size = 8M
@@ -40,21 +55,21 @@ dstatのCSVファイルサイズが大きい場合、PHPで大きなファイル
 
 ## ウェブ画面からの使い方
 
-Webブラウザでhttp://&lt;server\_host&gt;/&lt;script\_dir&gt;/にアクセスすると、CSVファイルをアップロードする画面が表示されます。
+Webブラウザでhttp://&lt;server\_host&gt;/&lt;script\_dir&gt;/にアクセスすると、CSVファイルをアップロードする画面が表示されます。CSVファイルを指定してUploadボタンを押すと、グラフが描画されます。
 
-* CSV File
-    * CSV File … アップロードするCSVファイルを指定します。
-* Graph Size
-    * Width … グラフの横サイズを指定します。単位はピクセルです。
-    * Height … グラフの縦サイズを指定します。単位はピクセルです。
-* Upper Limits
-    * Disk I/O … Disk I/Oのグラフについて、Y軸の最大値を指定します。単位はバイト/秒です。0を指定すると自動調節されます。
-    * Network I/O … Network I/Oのグラフについて、Y軸の最大値を指定します。単位はバイト/秒です。0を指定すると自動調節されます。
-* Time Range
-    * Offset … 指定した時間だけ、CSVファイルの先頭からカットして描画します。単位は秒です。
-    * Duration … CSVファイルの先頭、あるいはOffset位置から指定した時間のみ描画します。単位は秒です。0を指定するとCSVファイルの末尾まで描画します。
+- CSV File
+    - CSV File … アップロードするCSVファイルを指定します。
+- Graph Size
+    - Width … グラフの横サイズを指定します。単位はピクセルです。
+    - Height … グラフの縦サイズを指定します。単位はピクセルです。
+- Upper Limits
+    - Disk I/O … Disk I/Oのグラフについて、Y軸の最大値を指定します。単位はバイト/秒です。0を指定すると自動調節します。
+    - Network I/O … Network I/Oのグラフについて、Y軸の最大値を指定します。単位はバイト/秒です。0を指定すると自動調節します。
+- Time Range
+    - Offset … 指定した時間だけ、CSVファイルの先頭からカットして描画します。単位は秒です。
+    - Duration … CSVファイルの先頭、あるいはOffset位置から指定した時間のみ描画します。単位は秒です。0を指定するとCSVファイルの末尾まで描画します。
 
 ## Perlスクリプト単体での使い方
 
 (あとで)
-  
+
