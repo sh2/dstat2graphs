@@ -23,7 +23,7 @@ dstatのCSVファイルをもとにグラフを描画するWebアプリケーシ
 
 Red Hat Enterprise Linux 6と、そのクローンディストリビューションを対象にしています。
 
-Apatch HTTP ServerとPHPがインストールされている必要があります。初めにパッケージグループWeb ServerとPHP Supportをインストールしてください。
+Apache HTTP ServerとPHPがインストールされている必要があります。初めにパッケージグループWeb ServerとPHP Supportをインストールしてください。
 
     # yum groupinstall 'Web Server' 'PHP Support'
 
