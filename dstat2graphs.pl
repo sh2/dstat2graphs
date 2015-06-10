@@ -277,10 +277,10 @@ sub create_rrd {
     
     # Network individual
     foreach my $net (sort keys %index_net) {
-        push @options, "DS:NET_${net}_RECV:GAUGE:5:U:U";
+        push @options, "DS:N_${net}_R:GAUGE:5:U:U";
         push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
-        push @options, "DS:NET_${net}_SEND:GAUGE:5:U:U";
+        push @options, "DS:N_${net}_S:GAUGE:5:U:U";
         push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     }
     
@@ -1142,10 +1142,10 @@ sub create_graph {
         push @options, '--title';
         push @options, "Network I/O ${net} (Bytes/second)";
         
-        push @options, "DEF:RECV=${rrd_file}:NET_${net}_RECV:AVERAGE";
+        push @options, "DEF:RECV=${rrd_file}:N_${net}_R:AVERAGE";
         push @options, "LINE1:RECV#${colors[0]}:receive";
         
-        push @options, "DEF:SEND=${rrd_file}:NET_${net}_SEND:AVERAGE";
+        push @options, "DEF:SEND=${rrd_file}:N_${net}_S:AVERAGE";
         push @options, "LINE1:SEND#${colors[1]}:send";
         
         push @options, "VDEF:R_MIN=RECV,MINIMUM";
@@ -1190,7 +1190,7 @@ sub create_graph {
         push @options, '--title';
         push @options, "Network I/O ${net} receive (Bytes/second)";
         
-        push @options, "DEF:RECV=${rrd_file}:NET_${net}_RECV:AVERAGE";
+        push @options, "DEF:RECV=${rrd_file}:N_${net}_R:AVERAGE";
         push @options, "AREA:RECV#${colors[0]}:receive";
         
         push @options, "CDEF:RECV_AVG=RECV,${window},TREND";
@@ -1217,7 +1217,7 @@ sub create_graph {
         push @options, '--title';
         push @options, "Network I/O ${net} send (Bytes/second)";
         
-        push @options, "DEF:SEND=${rrd_file}:NET_${net}_SEND:AVERAGE";
+        push @options, "DEF:SEND=${rrd_file}:N_${net}_S:AVERAGE";
         push @options, "AREA:SEND#${colors[0]}:send";
         
         push @options, "CDEF:SEND_AVG=SEND,${window},TREND";
