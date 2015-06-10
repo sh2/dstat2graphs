@@ -219,10 +219,10 @@ sub create_rrd {
     
     # Disk individual
     foreach my $disk (sort keys %index_disk) {
-        push @options, "DS:DISK_${disk}_READ:GAUGE:5:U:U";
+        push @options, "DS:D_${disk}_R:GAUGE:5:U:U";
         push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
-        push @options, "DS:DISK_${disk}_WRIT:GAUGE:5:U:U";
+        push @options, "DS:D_${disk}_W:GAUGE:5:U:U";
         push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     }
     
@@ -724,10 +724,10 @@ sub create_graph {
         push @options, '--title';
         push @options, "Disk I/O ${disk} (Bytes/second)";
         
-        push @options, "DEF:READ=${rrd_file}:DISK_${disk}_READ:AVERAGE";
+        push @options, "DEF:READ=${rrd_file}:D_${disk}_R:AVERAGE";
         push @options, "LINE1:READ#${colors[0]}:read";
         
-        push @options, "DEF:WRIT=${rrd_file}:DISK_${disk}_WRIT:AVERAGE";
+        push @options, "DEF:WRIT=${rrd_file}:D_${disk}_W:AVERAGE";
         push @options, "LINE1:WRIT#${colors[1]}:write";
         
         push @options, "VDEF:R_MIN=READ,MINIMUM";
@@ -772,7 +772,7 @@ sub create_graph {
         push @options, '--title';
         push @options, "Disk I/O ${disk} read (Bytes/second)";
         
-        push @options, "DEF:READ=${rrd_file}:DISK_${disk}_READ:AVERAGE";
+        push @options, "DEF:READ=${rrd_file}:D_${disk}_R:AVERAGE";
         push @options, "AREA:READ#${colors[0]}:read";
         
         push @options, "CDEF:READ_AVG=READ,${window},TREND";
@@ -799,7 +799,7 @@ sub create_graph {
         push @options, '--title';
         push @options, "Disk I/O ${disk} write (Bytes/second)";
         
-        push @options, "DEF:WRIT=${rrd_file}:DISK_${disk}_WRIT:AVERAGE";
+        push @options, "DEF:WRIT=${rrd_file}:D_${disk}_W:AVERAGE";
         push @options, "AREA:WRIT#${colors[0]}:write";
         
         push @options, "CDEF:WRIT_AVG=WRIT,${window},TREND";
