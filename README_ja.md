@@ -21,7 +21,7 @@ dstatのCSVファイルをもとにグラフを描画するWebアプリケーシ
 
 ## セットアップ
 
-Red Hat Enterprise Linux 6と、そのクローンディストリビューションを対象にしています。
+Red Hat Enterprise Linux 6/7と、そのクローンディストリビューションを対象にしています。
 
 Apache HTTP ServerとPHPがインストールされている必要があります。初めにパッケージグループWeb ServerとPHP Supportをインストールしてください。
 
@@ -30,12 +30,13 @@ Apache HTTP ServerとPHPがインストールされている必要がありま�
 続いて以下のパッケージをインストールしてください。
 
 - perl-Archive-Zip
+- perl-HTML-Parser
 - rrdtool
 - rrdtool-perl
 
 <!-- dummy comment line for breaking list -->
 
-    # yum install perl-Archive-Zip rrdtool rrdtool-perl
+    # yum install perl-Archive-Zip perl-HTML-Parser rrdtool rrdtool-perl
 
 本ツールは作業ディレクトリとして/dev/shmを使用します。以下のようにして作業ディレクトリを作成し、apacheユーザが書き込みを行える状態にしてください。本ツールを恒久的に使用する場合は、/etc/rc.localに作業ディレクトリ作成処理を追加するなどしてください。
 

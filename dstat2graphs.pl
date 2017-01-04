@@ -1715,7 +1715,7 @@ _EOF_
       </div>
       <hr />
       <div class="footer">
-        (c) 2012-2014, Sadao Hiratsuka.
+        (c) 2012-2017, Sadao Hiratsuka.
       </div>
     </div>
     <script src="${top_dir}/js/jquery-1.11.0.min.js"></script>

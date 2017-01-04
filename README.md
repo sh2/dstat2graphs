@@ -21,7 +21,7 @@ When you use the demo site, please be aware of the following.
 
 ## Setup
 
-This tool is intended to be used in Red Hat Enterprise Linux 6 and its clone distributions.
+This tool is intended to be used in Red Hat Enterprise Linux 6/7 and its clone distributions.
 
 This tool requires Apache HTTP Server and PHP. Please install 'Web Server' and 'PHP Support' package groups.
 
@@ -30,12 +30,13 @@ This tool requires Apache HTTP Server and PHP. Please install 'Web Server' and '
 Next, please install the following packages.
 
 - perl-Archive-Zip
+- perl-HTML-Parser
 - rrdtool
 - rrdtool-perl
 
 <!-- dummy comment line for breaking list -->
 
-    # yum install perl-Archive-Zip rrdtool rrdtool-perl
+    # yum install perl-Archive-Zip perl-HTML-Parser rrdtool rrdtool-perl
 
 This tool uses '/dev/shm' as a working directory. Please create the working directory and give write permission to user 'apache'. If you want to use this tool permanently, please add such procedures to '/etc/rc.local'.
 
