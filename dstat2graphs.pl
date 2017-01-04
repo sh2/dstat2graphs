@@ -77,8 +77,8 @@ sub load_csv {
                 if ($cols[6] =~ /^\d+ \w+ (\d+)/) {
                     $year = $1;
                 }
-            # RHEL5:time, RHEL6:system
-            } elsif (($cols[0] eq 'time') or ($cols[0] eq 'system')) {
+            # RHEL 5:time, RHEL 6/7:system
+            } elsif ((($cols[0] eq 'time') or ($cols[0] eq 'system')) and ($cols[1] eq 'procs')) {
                 # Column name main
                 my $index = -1;
                 
@@ -103,7 +103,8 @@ sub load_csv {
                         $index_net{$net} = $index;
                     }
                 }
-            } elsif ($cols[0] eq 'date/time') {
+            # RHEL 6:date/time, RHEL 7:time
+            } elsif ((($cols[0] eq 'date/time') or ($cols[0] eq 'time')) and ($cols[1] eq 'run')) {
                 # Column name sub
             } else {
                 die 'It is not a dstat CSV file.';
