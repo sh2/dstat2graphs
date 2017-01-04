@@ -23,6 +23,7 @@ my $disk_limit = $ARGV[4];
 my $net_limit  = $ARGV[5];
 my $offset     = $ARGV[6];
 my $duration   = $ARGV[7];
+my $io_limit   = 0;
 
 my @colors = (
     '008FFF', 'FF00BF', 'BFBF00', 'BF00FF',
@@ -40,7 +41,7 @@ my $epoch = 978274800; # 2001/01/01 00:00:00
 my $top_dir = '../..';
 my $rrd_file = '/dev/shm/dstat2graphs/' . &random_str() . '.rrd';
 
-my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net, %value);
+my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net, %index_io, %value);
 my ($start_time, $end_time, $memory_size) = (0, 0, 0);
 
 &load_csv();
@@ -101,6 +102,12 @@ sub load_csv {
                         my $net = $1;
                         $net =~ tr/\//_/;
                         $index_net{$net} = $index;
+                    } elsif (($col =~ /^io\/(\w+[a-z])$/)
+                             or ($col =~ /^io\/cciss\/(c\d+d\d+)$/)) {
+                        # Disk IOPS
+                        my $io = $1;
+                        $io =~ tr/\//_/;
+                        $index_io{$io} = $index;
                     }
                 }
             # RHEL 6:date/time, RHEL 7:time
@@ -134,6 +141,10 @@ sub load_csv {
                 
                 if (!%index_net) {
                     die 'It is not a dstat CSV file. No \'net/*\' columns found.';
+                }
+                
+                if (!%index_io) {
+                    # warn 'It may not be a dstat CSV file. No \'io/*:\' columns found.';
                 }
                 
                 $csv_start_time = $unixtime;
@@ -285,6 +296,24 @@ sub create_rrd {
         push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     }
     
+    if (%index_io) {
+        # Disk IOPS total
+        push @options, 'DS:IO_READ:GAUGE:5:U:U';
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        
+        push @options, 'DS:IO_WRIT:GAUGE:5:U:U';
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        
+        # Disk IOPS individual
+        foreach my $io (sort keys %index_io) {
+            push @options, "DS:I_${io}_R:GAUGE:5:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+            
+            push @options, "DS:I_${io}_W:GAUGE:5:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        }
+    }
+    
     RRDs::create($rrd_file, @options);
     
     if (my $error = RRDs::error) {
@@ -379,6 +408,26 @@ sub update_rrd {
             $net_send = $cols[$index_net{$net} + 1];
             
             $entry .= ":${net_recv}:${net_send}";
+        }
+        
+        if (%index_io) {
+            # Disk IOPS total
+            my ($io_read, $io_writ) = (0, 0);
+            
+            foreach my $io (keys %index_io) {
+                $io_read += $cols[$index_io{$io}];
+                $io_writ += $cols[$index_io{$io} + 1];
+            }
+            
+            $entry .= ":${io_read}:${io_writ}";
+            
+            # Disk IOPS individual
+            foreach my $io (sort keys %index_io) {
+                $io_read = $cols[$index_io{$io}];
+                $io_writ = $cols[$index_io{$io} + 1];
+                
+                $entry .= ":${io_read}:${io_writ}";
+            }
         }
         
         push @entries, $entry;
@@ -1231,6 +1280,214 @@ sub create_graph {
             die $error;
         }
     }
+    
+    if (%index_io) {
+        # Disk IOPS total
+        @options = @template;
+        
+        if ($io_limit != 0) {
+            push @options, '--upper-limit';
+            push @options, $io_limit;
+        }
+        
+        push @options, '--base';
+        push @options, 1024;
+        
+        push @options, '--title';
+        push @options, 'Disk IOPS total (/second)';
+        
+        push @options, "DEF:READ=${rrd_file}:IO_READ:AVERAGE";
+        push @options, "LINE1:READ#${colors[0]}:read";
+        
+        push @options, "DEF:WRIT=${rrd_file}:IO_WRIT:AVERAGE";
+        push @options, "LINE1:WRIT#${colors[1]}:write";
+        
+        push @options, "VDEF:R_MIN=READ,MINIMUM";
+        push @options, "PRINT:R_MIN:%4.2lf %s";
+        push @options, "VDEF:R_AVG=READ,AVERAGE";
+        push @options, "PRINT:R_AVG:%4.2lf %s";
+        push @options, "VDEF:R_MAX=READ,MAXIMUM";
+        push @options, "PRINT:R_MAX:%4.2lf %s";
+        
+        push @options, "VDEF:W_MIN=WRIT,MINIMUM";
+        push @options, "PRINT:W_MIN:%4.2lf %s";
+        push @options, "VDEF:W_AVG=WRIT,AVERAGE";
+        push @options, "PRINT:W_AVG:%4.2lf %s";
+        push @options, "VDEF:W_MAX=WRIT,MAXIMUM";
+        push @options, "PRINT:W_MAX:%4.2lf %s";
+        
+        @values = RRDs::graph("${report_dir}/io_rw.png", @options);
+        
+        if (my $error = RRDs::error) {
+            &delete_rrd();
+            die $error;
+        }
+        
+        $value{'IO'}->{'R_MIN'} = $values[0]->[0];
+        $value{'IO'}->{'R_AVG'} = $values[0]->[1];
+        $value{'IO'}->{'R_MAX'} = $values[0]->[2];
+        $value{'IO'}->{'W_MIN'} = $values[0]->[3];
+        $value{'IO'}->{'W_AVG'} = $values[0]->[4];
+        $value{'IO'}->{'W_MAX'} = $values[0]->[5];
+        
+        # read
+        @options = @template;
+        
+        if ($io_limit != 0) {
+            push @options, '--upper-limit';
+            push @options, $io_limit;
+        }
+        
+        push @options, '--base';
+        push @options, 1024;
+        
+        push @options, '--title';
+        push @options, 'Disk IOPS total read (/second)';
+        
+        push @options, "DEF:READ=${rrd_file}:IO_READ:AVERAGE";
+        push @options, "AREA:READ#${colors[0]}:read";
+        
+        push @options, "CDEF:READ_AVG=READ,${window},TREND";
+        push @options, "LINE1:READ_AVG#${colors[1]}:read_${window}seconds";
+        
+        RRDs::graph("${report_dir}/io_r.png", @options);
+        
+        if (my $error = RRDs::error) {
+            &delete_rrd();
+            die $error;
+        }
+        
+        # write
+        @options = @template;
+        
+        if ($io_limit != 0) {
+            push @options, '--upper-limit';
+            push @options, $io_limit;
+        }
+        
+        push @options, '--base';
+        push @options, 1024;
+        
+        push @options, '--title';
+        push @options, 'Disk IOPS total write (/second)';
+        
+        push @options, "DEF:WRIT=${rrd_file}:IO_WRIT:AVERAGE";
+        push @options, "AREA:WRIT#${colors[0]}:write";
+        
+        push @options, "CDEF:WRIT_AVG=WRIT,${window},TREND";
+        push @options, "LINE1:WRIT_AVG#${colors[1]}:write_${window}seconds";
+        
+        RRDs::graph("${report_dir}/io_w.png", @options);
+        
+        if (my $error = RRDs::error) {
+            &delete_rrd();
+            die $error;
+        }
+        
+        # Disk IOPS individual
+        foreach my $io (sort keys %index_io) {
+            @options = @template;
+            
+            if ($io_limit != 0) {
+                push @options, '--upper-limit';
+                push @options, $io_limit;
+            }
+            
+            push @options, '--base';
+            push @options, 1024;
+            
+            push @options, '--title';
+            push @options, "Disk IOPS ${io} (/second)";
+            
+            push @options, "DEF:READ=${rrd_file}:I_${io}_R:AVERAGE";
+            push @options, "LINE1:READ#${colors[0]}:read";
+            
+            push @options, "DEF:WRIT=${rrd_file}:I_${io}_W:AVERAGE";
+            push @options, "LINE1:WRIT#${colors[1]}:write";
+            
+            push @options, "VDEF:R_MIN=READ,MINIMUM";
+            push @options, "PRINT:R_MIN:%4.2lf %s";
+            push @options, "VDEF:R_AVG=READ,AVERAGE";
+            push @options, "PRINT:R_AVG:%4.2lf %s";
+            push @options, "VDEF:R_MAX=READ,MAXIMUM";
+            push @options, "PRINT:R_MAX:%4.2lf %s";
+            
+            push @options, "VDEF:W_MIN=WRIT,MINIMUM";
+            push @options, "PRINT:W_MIN:%4.2lf %s";
+            push @options, "VDEF:W_AVG=WRIT,AVERAGE";
+            push @options, "PRINT:W_AVG:%4.2lf %s";
+            push @options, "VDEF:W_MAX=WRIT,MAXIMUM";
+            push @options, "PRINT:W_MAX:%4.2lf %s";
+            
+            @values = RRDs::graph("${report_dir}/io_${io}_rw.png", @options);
+            
+            if (my $error = RRDs::error) {
+                &delete_rrd();
+                die $error;
+            }
+            
+            $value{"IO_${io}"}->{'R_MIN'} = $values[0]->[0];
+            $value{"IO_${io}"}->{'R_AVG'} = $values[0]->[1];
+            $value{"IO_${io}"}->{'R_MAX'} = $values[0]->[2];
+            $value{"IO_${io}"}->{'W_MIN'} = $values[0]->[3];
+            $value{"IO_${io}"}->{'W_AVG'} = $values[0]->[4];
+            $value{"IO_${io}"}->{'W_MAX'} = $values[0]->[5];
+            
+            # read
+            @options = @template;
+            
+            if ($io_limit != 0) {
+                push @options, '--upper-limit';
+                push @options, $io_limit;
+            }
+            
+            push @options, '--base';
+            push @options, 1024;
+            
+            push @options, '--title';
+            push @options, "Disk IOPS ${io} read (/second)";
+            
+            push @options, "DEF:READ=${rrd_file}:I_${io}_R:AVERAGE";
+            push @options, "AREA:READ#${colors[0]}:read";
+            
+            push @options, "CDEF:READ_AVG=READ,${window},TREND";
+            push @options, "LINE1:READ_AVG#${colors[1]}:read_${window}seconds";
+            
+            RRDs::graph("${report_dir}/io_${io}_r.png", @options);
+            
+            if (my $error = RRDs::error) {
+                &delete_rrd();
+                die $error;
+            }
+            
+            # write
+            @options = @template;
+            
+            if ($io_limit != 0) {
+                push @options, '--upper-limit';
+                push @options, $io_limit;
+            }
+            
+            push @options, '--base';
+            push @options, 1024;
+            
+            push @options, '--title';
+            push @options, "Disk IOPS ${io} write (/second)";
+            
+            push @options, "DEF:WRIT=${rrd_file}:I_${io}_W:AVERAGE";
+            push @options, "AREA:WRIT#${colors[0]}:write";
+            
+            push @options, "CDEF:WRIT_AVG=WRIT,${window},TREND";
+            push @options, "LINE1:WRIT_AVG#${colors[1]}:write_${window}seconds";
+            
+            RRDs::graph("${report_dir}/io_${io}_w.png", @options);
+            
+            if (my $error = RRDs::error) {
+                &delete_rrd();
+                die $error;
+            }
+        }
+    }
 }
 
 sub delete_rrd {
@@ -1318,6 +1575,18 @@ _EOF_
     foreach my $net (sort keys %index_net) {
         print $fh ' ' x 14;
         print $fh "<li><a href=\"#net_${net}\">Network I/O ${net}</a></li>\n";
+    }
+    
+    if (%index_io) {
+        print $fh <<_EOF_;
+              <li class="nav-header">Disk IOPS</li>
+              <li><a href="#io">Disk IOPS total</a></li>
+_EOF_
+        
+        foreach my $io (sort keys %index_io) {
+            print $fh ' ' x 14;
+            print $fh "<li><a href=\"#io_${io}\">Disk IOPS ${io}</a></li>\n";
+        }
     }
     
     print $fh <<_EOF_;
@@ -1708,6 +1977,73 @@ _EOF_
             </tbody>
           </table>
 _EOF_
+    }
+    
+    if (%index_io) {
+        print $fh <<_EOF_;
+          <h2>Disk IOPS</h2>
+          <h3 id="io">Disk IOPS total</h3>
+          <p><img src="io_rw.png" alt="Disk IOPS total" /></p>
+          <p><img src="io_r.png" alt="Disk IOPS total read" /></p>
+          <p><img src="io_w.png" alt="Disk IOPS total write" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Disk IOPS total (/second)</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>read</td>
+                <td class="number">$value{'IO'}->{'R_MIN'}</td>
+                <td class="number">$value{'IO'}->{'R_AVG'}</td>
+                <td class="number">$value{'IO'}->{'R_MAX'}</td>
+              </tr>
+              <tr>
+                <td>write</td>
+                <td class="number">$value{'IO'}->{'W_MIN'}</td>
+                <td class="number">$value{'IO'}->{'W_AVG'}</td>
+                <td class="number">$value{'IO'}->{'W_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
+_EOF_
+        
+        foreach my $io (sort keys %index_io) {
+            print $fh <<_EOF_;
+          <h3 id="io_${io}">Disk IOPS ${io}</h3>
+          <p><img src="io_${io}_rw.png" alt="Disk IOPS ${io}"></p>
+          <p><img src="io_${io}_r.png" alt="Disk IOPS ${io} read"></p>
+          <p><img src="io_${io}_w.png" alt="Disk IOPS ${io} write"></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Disk IOPS ${io} (/second)</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>read</td>
+                <td class="number">$value{"IO_${io}"}->{'R_MIN'}</td>
+                <td class="number">$value{"IO_${io}"}->{'R_AVG'}</td>
+                <td class="number">$value{"IO_${io}"}->{'R_MAX'}</td>
+              </tr>
+              <tr>
+                <td>write</td>
+                <td class="number">$value{"IO_${io}"}->{'W_MIN'}</td>
+                <td class="number">$value{"IO_${io}"}->{'W_AVG'}</td>
+                <td class="number">$value{"IO_${io}"}->{'W_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
+_EOF_
+        }
     }
     
     print $fh <<_EOF_;
