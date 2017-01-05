@@ -41,7 +41,7 @@ my $epoch = 978274800; # 2001/01/01 00:00:00
 my $top_dir = '../..';
 my $rrd_file = '/dev/shm/dstat2graphs/' . &random_str() . '.rrd';
 
-my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net, %index_io, %value);
+my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net, %index_io, $index_load, %value);
 my ($start_time, $end_time, $memory_size) = (0, 0, 0);
 
 &load_csv();
@@ -108,6 +108,8 @@ sub load_csv {
                         my $io = $1;
                         $io =~ tr/\//_/;
                         $index_io{$io} = $index;
+                    } elsif ($col eq 'load avg') {
+                        $index_load = $index;
                     }
                 }
             # RHEL 6:date/time, RHEL 7:time
@@ -145,6 +147,10 @@ sub load_csv {
                 
                 if (!%index_io) {
                     # warn 'It may not be a dstat CSV file. No \'io/*:\' columns found.';
+                }
+                
+                if (!defined($index_load)) {
+                    # warn 'It may not be a dstat CSV file. No \'load avg\' columns found.';
                 }
                 
                 $csv_start_time = $unixtime;
@@ -314,6 +320,18 @@ sub create_rrd {
         }
     }
     
+    if (defined($index_load)) {
+        # Load Average
+        push @options, 'DS:LOAD_01M:GAUGE:5:U:U';
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        
+        push @options, 'DS:LOAD_05M:GAUGE:5:U:U';
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        
+        push @options, 'DS:LOAD_15M:GAUGE:5:U:U';
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+    }
+    
     RRDs::create($rrd_file, @options);
     
     if (my $error = RRDs::error) {
@@ -428,6 +446,11 @@ sub update_rrd {
                 
                 $entry .= ":${io_read}:${io_writ}";
             }
+        }
+        
+        if (defined($index_load)) {
+            # Load Average
+            $entry .= ":${cols[${index_load}]}:${cols[${index_load} + 1]}:${cols[${index_load} + 2]}";
         }
         
         push @entries, $entry;
@@ -1321,18 +1344,18 @@ sub create_graph {
         push @options, "LINE1:WRIT#${colors[1]}:write";
         
         push @options, "VDEF:R_MIN=READ,MINIMUM";
-        push @options, "PRINT:R_MIN:%4.2lf %s";
+        push @options, "PRINT:R_MIN:%4.2lf";
         push @options, "VDEF:R_AVG=READ,AVERAGE";
-        push @options, "PRINT:R_AVG:%4.2lf %s";
+        push @options, "PRINT:R_AVG:%4.2lf";
         push @options, "VDEF:R_MAX=READ,MAXIMUM";
-        push @options, "PRINT:R_MAX:%4.2lf %s";
+        push @options, "PRINT:R_MAX:%4.2lf";
         
         push @options, "VDEF:W_MIN=WRIT,MINIMUM";
-        push @options, "PRINT:W_MIN:%4.2lf %s";
+        push @options, "PRINT:W_MIN:%4.2lf";
         push @options, "VDEF:W_AVG=WRIT,AVERAGE";
-        push @options, "PRINT:W_AVG:%4.2lf %s";
+        push @options, "PRINT:W_AVG:%4.2lf";
         push @options, "VDEF:W_MAX=WRIT,MAXIMUM";
-        push @options, "PRINT:W_MAX:%4.2lf %s";
+        push @options, "PRINT:W_MAX:%4.2lf";
         
         @values = RRDs::graph("${report_dir}/io_rw.png", @options);
         
@@ -1424,18 +1447,18 @@ sub create_graph {
             push @options, "LINE1:WRIT#${colors[1]}:write";
             
             push @options, "VDEF:R_MIN=READ,MINIMUM";
-            push @options, "PRINT:R_MIN:%4.2lf %s";
+            push @options, "PRINT:R_MIN:%4.2lf";
             push @options, "VDEF:R_AVG=READ,AVERAGE";
-            push @options, "PRINT:R_AVG:%4.2lf %s";
+            push @options, "PRINT:R_AVG:%4.2lf";
             push @options, "VDEF:R_MAX=READ,MAXIMUM";
-            push @options, "PRINT:R_MAX:%4.2lf %s";
+            push @options, "PRINT:R_MAX:%4.2lf";
             
             push @options, "VDEF:W_MIN=WRIT,MINIMUM";
-            push @options, "PRINT:W_MIN:%4.2lf %s";
+            push @options, "PRINT:W_MIN:%4.2lf";
             push @options, "VDEF:W_AVG=WRIT,AVERAGE";
-            push @options, "PRINT:W_AVG:%4.2lf %s";
+            push @options, "PRINT:W_AVG:%4.2lf";
             push @options, "VDEF:W_MAX=WRIT,MAXIMUM";
-            push @options, "PRINT:W_MAX:%4.2lf %s";
+            push @options, "PRINT:W_MAX:%4.2lf";
             
             @values = RRDs::graph("${report_dir}/io_${io}_rw.png", @options);
             
@@ -1505,6 +1528,61 @@ sub create_graph {
                 die $error;
             }
         }
+    }
+    
+    if (defined($index_load)) {
+        # Load Average
+        @options = @template;
+
+        push @options, '--title';
+        push @options, 'Load Average';
+        
+        push @options, "DEF:L01M=${rrd_file}:LOAD_01M:AVERAGE";
+        push @options, "LINE1:L01M#${colors[0]}:1min";
+        
+        push @options, "DEF:L05M=${rrd_file}:LOAD_05M:AVERAGE";
+        push @options, "LINE1:L05M#${colors[1]}:5min";
+        
+        push @options, "DEF:L15M=${rrd_file}:LOAD_15M:AVERAGE";
+        push @options, "LINE1:L15M#${colors[2]}:15min";
+        
+        push @options, "VDEF:L01M_MIN=L01M,MINIMUM";
+        push @options, "PRINT:L01M_MIN:%4.2lf";
+        push @options, "VDEF:L01M_AVG=L01M,AVERAGE";
+        push @options, "PRINT:L01M_AVG:%4.2lf";
+        push @options, "VDEF:L01M_MAX=L01M,MAXIMUM";
+        push @options, "PRINT:L01M_MAX:%4.2lf";
+        
+        push @options, "VDEF:L05M_MIN=L05M,MINIMUM";
+        push @options, "PRINT:L05M_MIN:%4.2lf";
+        push @options, "VDEF:L05M_AVG=L05M,AVERAGE";
+        push @options, "PRINT:L05M_AVG:%4.2lf";
+        push @options, "VDEF:L05M_MAX=L05M,MAXIMUM";
+        push @options, "PRINT:L05M_MAX:%4.2lf";
+        
+        push @options, "VDEF:L15M_MIN=L15M,MINIMUM";
+        push @options, "PRINT:L15M_MIN:%4.2lf";
+        push @options, "VDEF:L15M_AVG=L15M,AVERAGE";
+        push @options, "PRINT:L15M_AVG:%4.2lf";
+        push @options, "VDEF:L15M_MAX=L15M,MAXIMUM";
+        push @options, "PRINT:L15M_MAX:%4.2lf";
+        
+        @values = RRDs::graph("${report_dir}/load.png", @options);
+        
+        if (my $error = RRDs::error) {
+            &delete_rrd();
+            die $error;
+        }
+        
+        $value{'LOAD'}->{'L01M_MIN'} = $values[0]->[0];
+        $value{'LOAD'}->{'L01M_AVG'} = $values[0]->[1];
+        $value{'LOAD'}->{'L01M_MAX'} = $values[0]->[2];
+        $value{'LOAD'}->{'L05M_MIN'} = $values[0]->[3];
+        $value{'LOAD'}->{'L05M_AVG'} = $values[0]->[4];
+        $value{'LOAD'}->{'L05M_MAX'} = $values[0]->[5];
+        $value{'LOAD'}->{'L15M_MIN'} = $values[0]->[6];
+        $value{'LOAD'}->{'L15M_AVG'} = $values[0]->[7];
+        $value{'LOAD'}->{'L15M_MAX'} = $values[0]->[8];
     }
 }
 
@@ -1604,6 +1682,13 @@ _EOF_
             print $fh ' ' x 14;
             print $fh "<li><a href=\"#io_${io}\">Disk IOPS ${io}</a></li>\n";
         }
+    }
+    
+    if (defined($index_load)) {
+        print $fh <<_EOF_;
+              <li class="nav-header">Load Average</li>
+              <li><a href="#load">Load Average</a></li>
+_EOF_
     }
     
     print $fh <<_EOF_;
@@ -2051,6 +2136,45 @@ _EOF_
         }
     }
     
+    if (defined($index_load)) {
+        print $fh <<_EOF_;
+          <hr />
+          <h2>Load Average</h2>
+          <h3 id="load">Load Average</h3>
+          <p><img src="load.png" alt="Load Average" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Load Average</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1 minute</td>
+                <td class="number">$value{'LOAD'}->{'L01M_MIN'}</td>
+                <td class="number">$value{'LOAD'}->{'L01M_AVG'}</td>
+                <td class="number">$value{'LOAD'}->{'L01M_MAX'}</td>
+              </tr>
+              <tr>
+                <td>5 minutes</td>
+                <td class="number">$value{'LOAD'}->{'L05M_MIN'}</td>
+                <td class="number">$value{'LOAD'}->{'L05M_AVG'}</td>
+                <td class="number">$value{'LOAD'}->{'L05M_MAX'}</td>
+              </tr>
+              <tr>
+                <td>15 minutes</td>
+                <td class="number">$value{'LOAD'}->{'L15M_MIN'}</td>
+                <td class="number">$value{'LOAD'}->{'L15M_AVG'}</td>
+                <td class="number">$value{'LOAD'}->{'L15M_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
+_EOF_
+    }
+
     print $fh <<_EOF_;
         </div>
       </div>
