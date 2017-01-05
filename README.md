@@ -1,8 +1,9 @@
 # dstat2graphs
 
-This is a web application which draws graphs from a dstat CSV file. It accepts the file only output by the following options.
+This is a web application which draws graphs from a dstat CSV file. It accepts files output with the following options.
 
-    $ dstat -tvfn --output log.csv 1
+    $ dstat -tfvn --output log.csv 1
+    $ dstat -tfvnrl --output log.csv 1
 
 ## Sample
 

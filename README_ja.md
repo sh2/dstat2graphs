@@ -1,8 +1,9 @@
 # dstat2graphs
 
-dstatのCSVファイルをもとにグラフを描画するWebアプリケーションです。以下のオプションで出力されたファイルのみを受け付けます。
+dstatのCSVファイルをもとにグラフを描画するWebアプリケーションです。以下のオプションで出力されたファイルを受け付けます。
 
-    $ dstat -tvfn --output log.csv 1
+    $ dstat -tfvn --output log.csv 1
+    $ dstat -tfvnrl --output log.csv 1
 
 ## サンプル
 

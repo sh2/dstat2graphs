@@ -17,8 +17,11 @@
     <div class="container-fluid">
       <div class="hero-unit">
         <h1>dstat2graphs</h1>
-        <p>It works only for 'dstat -tvfn --output log.csv 1'.</p>
       </div>
+      <p class="lead">It accepts files output with the following options.</p>
+      <pre>
+$ dstat -tfvn --output log.csv 1
+$ dstat -tfvnrl --output log.csv 1</pre>
       <form action="dstat2graphs.php" method="post" enctype="multipart/form-data" class="form-horizontal">
         <fieldset>
           <legend>dstat CSV File</legend>
