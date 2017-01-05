@@ -474,7 +474,47 @@ sub create_graph {
     
     push @template, '--rigid';
     
-    # Processes running
+    # Processes running, blocked
+    @options = @template;
+    
+    push @options, '--title';
+    push @options, 'Processes runnning, blocked';
+    
+    push @options, "DEF:RUN=${rrd_file}:PROCS_RUN:AVERAGE";
+    push @options, "AREA:RUN#${colors[0]}:running";
+    
+    push @options, "DEF:BLK=${rrd_file}:PROCS_BLK:AVERAGE";
+    push @options, "STACK:BLK#${colors[1]}:blocked";
+    
+    push @options, "VDEF:R_MIN=RUN,MINIMUM";
+    push @options, "PRINT:R_MIN:%4.2lf";
+    push @options, "VDEF:R_AVG=RUN,AVERAGE";
+    push @options, "PRINT:R_AVG:%4.2lf";
+    push @options, "VDEF:R_MAX=RUN,MAXIMUM";
+    push @options, "PRINT:R_MAX:%4.2lf";
+    
+    push @options, "VDEF:B_MIN=BLK,MINIMUM";
+    push @options, "PRINT:B_MIN:%4.2lf";
+    push @options, "VDEF:B_AVG=BLK,AVERAGE";
+    push @options, "PRINT:B_AVG:%4.2lf";
+    push @options, "VDEF:B_MAX=BLK,MAXIMUM";
+    push @options, "PRINT:B_MAX:%4.2lf";
+    
+    @values = RRDs::graph("${report_dir}/procs_rb.png", @options);
+    
+    if (my $error = RRDs::error) {
+        &delete_rrd();
+        die $error;
+    }
+    
+    $value{'PROCS_RB'}->{'R_MIN'} = $values[0]->[0];
+    $value{'PROCS_RB'}->{'R_AVG'} = $values[0]->[1];
+    $value{'PROCS_RB'}->{'R_MAX'} = $values[0]->[2];
+    $value{'PROCS_RB'}->{'B_MIN'} = $values[0]->[3];
+    $value{'PROCS_RB'}->{'B_AVG'} = $values[0]->[4];
+    $value{'PROCS_RB'}->{'B_MAX'} = $values[0]->[5];
+    
+    # running
     @options = @template;
     
     push @options, '--title';
@@ -486,13 +526,6 @@ sub create_graph {
     push @options, "CDEF:RUN_AVG=RUN,${window},TREND";
     push @options, "LINE1:RUN_AVG#${colors[1]}:running_${window}seconds";
     
-    push @options, "VDEF:MIN=RUN,MINIMUM";
-    push @options, "PRINT:MIN:%4.2lf";
-    push @options, "VDEF:AVG=RUN,AVERAGE";
-    push @options, "PRINT:AVG:%4.2lf";
-    push @options, "VDEF:MAX=RUN,MAXIMUM";
-    push @options, "PRINT:MAX:%4.2lf";
-    
     @values = RRDs::graph("${report_dir}/procs_run.png", @options);
     
     if (my $error = RRDs::error) {
@@ -500,11 +533,7 @@ sub create_graph {
         die $error;
     }
     
-    $value{'PROCS_RUN'}->{'MIN'} = $values[0]->[0];
-    $value{'PROCS_RUN'}->{'AVG'} = $values[0]->[1];
-    $value{'PROCS_RUN'}->{'MAX'} = $values[0]->[2];
-    
-    # Processes blocked
+    # blocked
     @options = @template;
     
     push @options, '--title';
@@ -516,23 +545,12 @@ sub create_graph {
     push @options, "CDEF:BLK_AVG=BLK,${window},TREND";
     push @options, "LINE1:BLK_AVG#${colors[1]}:blocked_${window}seconds";
     
-    push @options, "VDEF:MIN=BLK,MINIMUM";
-    push @options, "PRINT:MIN:%4.2lf";
-    push @options, "VDEF:AVG=BLK,AVERAGE";
-    push @options, "PRINT:AVG:%4.2lf";
-    push @options, "VDEF:MAX=BLK,MAXIMUM";
-    push @options, "PRINT:MAX:%4.2lf";
-    
     @values = RRDs::graph("${report_dir}/procs_blk.png", @options);
     
     if (my $error = RRDs::error) {
         &delete_rrd();
         die $error;
     }
-    
-    $value{'PROCS_BLK'}->{'MIN'} = $values[0]->[0];
-    $value{'PROCS_BLK'}->{'AVG'} = $values[0]->[1];
-    $value{'PROCS_BLK'}->{'MAX'} = $values[0]->[2];
     
     # Processes new
     @options = @template;
@@ -1538,8 +1556,7 @@ sub create_html {
           <div class="well sidebar-nav">
             <ul class="nav nav-list">
               <li class="nav-header">Processes</li>
-              <li><a href="#procs_run">Processes running</a></li>
-              <li><a href="#procs_blk">Processes blocked</a></li>
+              <li><a href="#procs_rb">Processes running, blocked</a></li>
               <li><a href="#procs_new">Processes new</a></li>
               <li class="nav-header">Memory Usage</li>
               <li><a href="#memory">Memory Usage</a></li>
@@ -1604,12 +1621,14 @@ _EOF_
           </div>
           <p><a href="d_${report_suffix}.zip">Download a Zip file</a></p>
           <h2>Processes</h2>
-          <h3 id="procs_run">Processes running</h3>
+          <h3 id="procs_rb">Processes running, blocked</h3>
+          <p><img src="procs_rb.png" alt="Processes running, blocked" /></p>
           <p><img src="procs_run.png" alt="Processes running" /></p>
+          <p><img src="procs_blk.png" alt="Processes blocked" /></p>
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="header">Processes running</th>
+                <th class="header">Processes</th>
                 <th class="header">Minimum</th>
                 <th class="header">Average</th>
                 <th class="header">Maximum</th>
@@ -1618,29 +1637,15 @@ _EOF_
             <tbody>
               <tr>
                 <td>running</td>
-                <td class="number">$value{'PROCS_RUN'}->{'MIN'}</td>
-                <td class="number">$value{'PROCS_RUN'}->{'AVG'}</td>
-                <td class="number">$value{'PROCS_RUN'}->{'MAX'}</td>
+                <td class="number">$value{'PROCS_RB'}->{'R_MIN'}</td>
+                <td class="number">$value{'PROCS_RB'}->{'R_AVG'}</td>
+                <td class="number">$value{'PROCS_RB'}->{'R_MAX'}</td>
               </tr>
-            </tbody>
-          </table>
-          <h3 id="procs_blk">Processes blocked</h3>
-          <p><img src="procs_blk.png" alt="Processes blocked" /></p>
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th class="header">Processes blocked</th>
-                <th class="header">Minimum</th>
-                <th class="header">Average</th>
-                <th class="header">Maximum</th>
-              </tr>
-            </thead>
-            <tbody>
               <tr>
                 <td>blocked</td>
-                <td class="number">$value{'PROCS_BLK'}->{'MIN'}</td>
-                <td class="number">$value{'PROCS_BLK'}->{'AVG'}</td>
-                <td class="number">$value{'PROCS_BLK'}->{'MAX'}</td>
+                <td class="number">$value{'PROCS_RB'}->{'B_MIN'}</td>
+                <td class="number">$value{'PROCS_RB'}->{'B_AVG'}</td>
+                <td class="number">$value{'PROCS_RB'}->{'B_MAX'}</td>
               </tr>
             </tbody>
           </table>
