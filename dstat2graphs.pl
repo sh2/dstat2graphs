@@ -11,8 +11,8 @@ use RRDs;
 use Text::ParseWords;
 use Time::Local;
 
-if ($#ARGV != 7) {
-    die 'Usage: perl dstat2graph.pl csv_file report_dir width height disk_limit net_limit offset duration';
+if (($#ARGV != 7) and ($#ARGV != 9)) {
+    die 'Usage: perl dstat2graph.pl csv_file report_dir width height disk_limit net_limit offset duration [io_limit] [is_actual]';
 }
 
 my $csv_file   = $ARGV[0];
@@ -24,6 +24,12 @@ my $net_limit  = $ARGV[5];
 my $offset     = $ARGV[6];
 my $duration   = $ARGV[7];
 my $io_limit   = 0;
+my $is_actual  = 0;
+
+if ($#ARGV == 9) {
+    $io_limit  = $ARGV[8];
+    $is_actual = $ARGV[9];
+}
 
 my @colors = (
     '008FFF', 'FF00BF', 'BFBF00', 'BF00FF',
@@ -195,7 +201,12 @@ sub create_rrd {
     
     # --start
     push @options, '--start';
-    push @options, $epoch - 1;
+    
+    if ($is_actual) {
+        push @options, $start_time - 1;
+    } else {
+        push @options, $epoch - 1;
+    }
     
     # --step
     push @options, '--step';
@@ -346,7 +357,11 @@ sub update_rrd {
         my $entry = '';
         my @cols = parse_line(',', 0, $row);
         
-        $entry .= $epoch + &get_unixtime($year, $cols[0]) - $start_time;
+        if ($is_actual) {
+            $entry .= &get_unixtime($year, $cols[0]);
+        } else {
+            $entry .= $epoch + &get_unixtime($year, $cols[0]) - $start_time;
+        }
         
         # Processes
         $entry .= ":${cols[1]}:${cols[2]}:${cols[3]}";
@@ -481,10 +496,20 @@ sub create_graph {
     
     # Template
     push @template, '--start';
-    push @template, $epoch;
+    
+    if ($is_actual) {
+        push @template, $start_time;
+    } else {
+        push @template, $epoch;
+    }
     
     push @template, '--end';
-    push @template, $epoch + $end_time - $start_time;
+    
+    if ($is_actual) {
+        push @template, $end_time;
+    } else {
+        push @template, $epoch + $end_time - $start_time;
+    }
     
     push @template, '--width';
     push @template, $width;

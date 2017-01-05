@@ -21,9 +21,9 @@
       </div>
       <form action="dstat2graphs.php" method="post" enctype="multipart/form-data" class="form-horizontal">
         <fieldset>
-          <legend>CSV File</legend>
+          <legend>dstat CSV File</legend>
           <div class="control-group">
-            <label class="control-label">CSV File</label>
+            <label class="control-label">dstat CSV File</label>
             <div class="controls">
               <!-- <input type="hidden" name="MAX_FILE_SIZE" value="4194304" /> -->
               <input type="file" name="csv_file" size="50" class="validate-file" />
@@ -49,11 +49,18 @@
           </div>
         </fieldset>
         <fieldset>
-          <legend>Upper Limits</legend>
+          <legend>Graph Upper Limits</legend>
           <div class="control-group">
             <label class="control-label">Disk I/O</label>
             <div class="controls">
               <input type="text" name="disk_limit" value="0" class="span2 validate-natural" /> (Bytes/second)
+              <span class="help-inline"></span>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Disk IOPS</label>
+            <div class="controls">
+              <input type="text" name="io_limit" value="0" class="span2 validate-natural" /> (/second)
               <span class="help-inline"></span>
             </div>
           </div>
@@ -66,7 +73,14 @@
           </div>
         </fieldset>
         <fieldset>
-          <legend>Time Range</legend>
+          <legend>Other Settings</legend>
+          <div class="control-group">
+            <label class="control-label">X-Axis</label>
+            <div class="controls">
+              <input type="radio" name="is_actual" value="0" class="span1" checked />Duration
+              <input type="radio" name="is_actual" value="1" class="span1" />Actual Time
+            </div>
+          </div>
           <div class="control-group">
             <label class="control-label">Offset</label>
             <div class="controls">

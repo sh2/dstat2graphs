@@ -35,10 +35,12 @@ $disk_limit = validate_number($_POST['disk_limit'], 0, PHP_INT_MAX, 0);
 $net_limit  = validate_number($_POST['net_limit'], 0, PHP_INT_MAX, 0);
 $offset     = validate_number($_POST['offset'], 0, PHP_INT_MAX, 0);
 $duration   = validate_number($_POST['duration'], 0, PHP_INT_MAX, 0);
+$io_limit   = validate_number($_POST['io_limit'], 0, PHP_INT_MAX, 0);
+$is_actual  = validate_number($_POST['is_actual'], 0, 1, 0);
 $message    = '';
 
 if (is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
-    exec("perl dstat2graphs.pl {$csv_file} {$report_dir} {$width} {$height} {$disk_limit} {$net_limit} {$offset} {$duration} 2>&1",
+    exec("perl dstat2graphs.pl {$csv_file} {$report_dir} {$width} {$height} {$disk_limit} {$net_limit} {$offset} {$duration} {$io_limit} {$is_actual} 2>&1",
         $output, $return_var);
     
     if ($return_var == 0) {
