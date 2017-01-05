@@ -2212,6 +2212,7 @@ _EOF_
       </div>
       <hr />
       <div class="footer">
+        <a href="https://github.com/sh2/dstat2graphs">https://github.com/sh2/dstat2graphs</a><br />
         (c) 2012-2017, Sadao Hiratsuka.
       </div>
     </div>
