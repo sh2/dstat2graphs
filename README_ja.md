@@ -22,7 +22,7 @@ dstatのCSVファイルをもとにグラフを描画するWebアプリケーシ
 
 ## セットアップ
 
-Red Hat Enterprise Linux 6/7と、そのクローンディストリビューションを対象にしています。
+Red Hat Enterprise Linux 6/7と、それらのクローンディストリビューションを対象にしています。
 
 Apache HTTP ServerとPHPがインストールされている必要があります。初めにパッケージグループWeb ServerとPHP Supportをインストールしてください。
 

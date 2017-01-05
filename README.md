@@ -22,7 +22,7 @@ When you use the demo site, please be aware of the following.
 
 ## Setup
 
-This tool is intended to be used in Red Hat Enterprise Linux 6/7 and its clone distributions.
+This tool is intended to be used in Red Hat Enterprise Linux 6/7 and their clone distributions.
 
 This tool requires Apache HTTP Server and PHP. Please install 'Web Server' and 'PHP Support' package groups.
 
