@@ -59,23 +59,25 @@ dstatのCSVファイルサイズが大きい場合、PHPで大きなファイル
 
 Webブラウザでhttp://&lt;server\_host&gt;/&lt;script\_dir&gt;/にアクセスすると、CSVファイルをアップロードする画面が表示されます。CSVファイルを指定してUploadボタンを押すと、グラフが描画されます。
 
-- CSV File
-    - CSV File … アップロードするCSVファイルを指定します。
+- dstat CSV File
+    - dstat CSV File … アップロードするCSVファイルを指定します。
 - Graph Size
     - Width … グラフの横サイズを指定します。単位はピクセルです。
     - Height … グラフの縦サイズを指定します。単位はピクセルです。
-- Upper Limits
+- Graph Upper Limits
     - Disk I/O … Disk I/Oのグラフについて、Y軸の最大値を指定します。単位はバイト/秒です。0を指定すると自動調節します。
+    - Disk IOPS … Disk IOPSのグラフについて、Y軸の最大値を指定します。単位は回/秒です。0を指定すると自動調節します。
     - Network I/O … Network I/Oのグラフについて、Y軸の最大値を指定します。単位はバイト/秒です。0を指定すると自動調節します。
-- Time Range
+- Other aettings
+    - X-Axis … X軸に経過時間を表示するか実際の時刻を表示するかを選択します。
     - Offset … 指定した時間だけ、CSVファイルの先頭からカットして描画します。単位は秒です。
     - Duration … CSVファイルの先頭、あるいはOffset位置から指定した時間のみ描画します。単位は秒です。0を指定するとCSVファイルの末尾まで描画します。
 
 ## Perlスクリプト単体での使い方
 
-Perlスクリプトdstat2graphs.plを単体で使用してグラフを描画することが可能です。作業ディレクトリ/dev/shm/dstat2graphsに対してスクリプト実行ユーザが書き込みを行える状態にしておいてください。コマンドラインオプションは以下の通りです。すべて指定する必要があります。
+Perlスクリプトdstat2graphs.plを単体で使用してグラフを描画することが可能です。作業ディレクトリ/dev/shm/dstat2graphsに対してスクリプト実行ユーザが書き込みを行える状態にしておいてください。コマンドラインオプションは以下の通りです。最後の二つを除きすべて指定する必要があります。
 
-    $ perl dstat2graph.pl csv_file report_dir width height disk_limit net_limit offset duration
+    $ perl dstat2graph.pl csv_file report_dir width height disk_limit net_limit offset duration [io_limit] [is_actual]
 
 - report_dir グラフを出力するディレクトリを指定します。ディレクトリが存在しない場合は自動作成します。
 

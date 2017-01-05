@@ -59,23 +59,25 @@ If the CSV file size is large, you should modify PHP settings to handle large fi
 
 If you access http://&lt;server\_host&gt;/&lt;script\_dir&gt;/ in a web browser, the screen will be displayed. When you specify the CSV file and press the Upload button, the graphs will be drawn.
 
-- CSV File
-    - CSV File ... Specify the CSV file you want to upload.
+- dstat CSV File
+    - dstat CSV File ... Specify the CSV file you want to upload.
 - Graph Size
     - Width ... Specify the horizontal size of graphs, in pixel.
     - Height ... Specify the vertical size of graphs, in pixel.
-- Upper Limits
+- Graph Upper Limits
     - Disk I/O ... Specify the maximum value of the Y-axis for Disk I/O graphs. The unit is Bytes/second. It is automatically adjusted if you specify 0.
+    - Disk IOPS ... Specify the maximum value of the Y-axis for Disk IOPS graphs. The unit is Times/second. It is automatically adjusted if you specify 0.
     - Network I/O ... Specify the maximum value of the Y-axis for Network I/O graphs. The unit is Bytes/second. It is automatically adjusted if you specify 0.
-- Time Range
+- Other Settings
+    - X-axis ... Select whether to display elapsed time or actual time on the X-axis.
     - Offset ... Cut the specified time from the beginning of the CSV file. The unit is second.
     - Duration ... Draw only the specified time from the beginning or the offset position. The unit is second. It draws until the end of the CSV file if you specify 0.
 
 ## Perl CUI
 
-It is possible to draw graphs using Perl script 'dstat2graphs.pl'. Please give write permission of '/dev/shm/dstat2graphs' to the user which executes this script. Command line options are as follows. You must specify all.
+It is possible to draw graphs using Perl script 'dstat2graphs.pl'. Please give write permission of '/dev/shm/dstat2graphs' to the user which executes this script. Command line options are as follows. You must specify everything except the last two.
 
-    $ perl dstat2graph.pl csv_file report_dir width height disk_limit net_limit offset duration
+    $ perl dstat2graph.pl csv_file report_dir width height disk_limit net_limit offset duration [io_limit] [is_actual]
 
 - report_dir ... Specify the directory where you want to store graphs. It is automatically created if it does not exist.
 
