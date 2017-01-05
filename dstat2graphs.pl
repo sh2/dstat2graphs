@@ -1680,6 +1680,18 @@ _EOF_
         print $fh "<li><a href=\"#disk_${disk}\">Disk I/O ${disk}</a></li>\n";
     }
     
+    if (%index_io) {
+        print $fh <<_EOF_;
+              <li class="nav-header">Disk IOPS</li>
+              <li><a href="#io">Disk IOPS total</a></li>
+_EOF_
+        
+        foreach my $io (sort keys %index_io) {
+            print $fh ' ' x 14;
+            print $fh "<li><a href=\"#io_${io}\">Disk IOPS ${io}</a></li>\n";
+        }
+    }
+    
     print $fh <<_EOF_;
               <li class="nav-header">System</li>
               <li><a href="#interrupts">Interrupts</a></li>
@@ -1701,18 +1713,6 @@ _EOF_
     foreach my $net (sort keys %index_net) {
         print $fh ' ' x 14;
         print $fh "<li><a href=\"#net_${net}\">Network I/O ${net}</a></li>\n";
-    }
-    
-    if (%index_io) {
-        print $fh <<_EOF_;
-              <li class="nav-header">Disk IOPS</li>
-              <li><a href="#io">Disk IOPS total</a></li>
-_EOF_
-        
-        foreach my $io (sort keys %index_io) {
-            print $fh ' ' x 14;
-            print $fh "<li><a href=\"#io_${io}\">Disk IOPS ${io}</a></li>\n";
-        }
     }
     
     if (defined($index_load)) {
@@ -1904,6 +1904,74 @@ _EOF_
             </tbody>
           </table>
 _EOF_
+    }
+    
+    if (%index_io) {
+        print $fh <<_EOF_;
+          <hr />
+          <h2>Disk IOPS</h2>
+          <h3 id="io">Disk IOPS total</h3>
+          <p><img src="io_rw.png" alt="Disk IOPS total" /></p>
+          <p><img src="io_r.png" alt="Disk IOPS total read" /></p>
+          <p><img src="io_w.png" alt="Disk IOPS total write" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Disk IOPS total (/second)</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>read</td>
+                <td class="number">$value{'IO'}->{'R_MIN'}</td>
+                <td class="number">$value{'IO'}->{'R_AVG'}</td>
+                <td class="number">$value{'IO'}->{'R_MAX'}</td>
+              </tr>
+              <tr>
+                <td>write</td>
+                <td class="number">$value{'IO'}->{'W_MIN'}</td>
+                <td class="number">$value{'IO'}->{'W_AVG'}</td>
+                <td class="number">$value{'IO'}->{'W_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
+_EOF_
+        
+        foreach my $io (sort keys %index_io) {
+            print $fh <<_EOF_;
+          <h3 id="io_${io}">Disk IOPS ${io}</h3>
+          <p><img src="io_${io}_rw.png" alt="Disk IOPS ${io}"></p>
+          <p><img src="io_${io}_r.png" alt="Disk IOPS ${io} read"></p>
+          <p><img src="io_${io}_w.png" alt="Disk IOPS ${io} write"></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">Disk IOPS ${io} (/second)</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>read</td>
+                <td class="number">$value{"IO_${io}"}->{'R_MIN'}</td>
+                <td class="number">$value{"IO_${io}"}->{'R_AVG'}</td>
+                <td class="number">$value{"IO_${io}"}->{'R_MAX'}</td>
+              </tr>
+              <tr>
+                <td>write</td>
+                <td class="number">$value{"IO_${io}"}->{'W_MIN'}</td>
+                <td class="number">$value{"IO_${io}"}->{'W_AVG'}</td>
+                <td class="number">$value{"IO_${io}"}->{'W_MAX'}</td>
+              </tr>
+            </tbody>
+          </table>
+_EOF_
+        }
     }
     
     print $fh <<_EOF_;
@@ -2098,73 +2166,6 @@ _EOF_
             </tbody>
           </table>
 _EOF_
-    }
-    
-    if (%index_io) {
-        print $fh <<_EOF_;
-          <h2>Disk IOPS</h2>
-          <h3 id="io">Disk IOPS total</h3>
-          <p><img src="io_rw.png" alt="Disk IOPS total" /></p>
-          <p><img src="io_r.png" alt="Disk IOPS total read" /></p>
-          <p><img src="io_w.png" alt="Disk IOPS total write" /></p>
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th class="header">Disk IOPS total (/second)</th>
-                <th class="header">Minimum</th>
-                <th class="header">Average</th>
-                <th class="header">Maximum</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>read</td>
-                <td class="number">$value{'IO'}->{'R_MIN'}</td>
-                <td class="number">$value{'IO'}->{'R_AVG'}</td>
-                <td class="number">$value{'IO'}->{'R_MAX'}</td>
-              </tr>
-              <tr>
-                <td>write</td>
-                <td class="number">$value{'IO'}->{'W_MIN'}</td>
-                <td class="number">$value{'IO'}->{'W_AVG'}</td>
-                <td class="number">$value{'IO'}->{'W_MAX'}</td>
-              </tr>
-            </tbody>
-          </table>
-_EOF_
-        
-        foreach my $io (sort keys %index_io) {
-            print $fh <<_EOF_;
-          <h3 id="io_${io}">Disk IOPS ${io}</h3>
-          <p><img src="io_${io}_rw.png" alt="Disk IOPS ${io}"></p>
-          <p><img src="io_${io}_r.png" alt="Disk IOPS ${io} read"></p>
-          <p><img src="io_${io}_w.png" alt="Disk IOPS ${io} write"></p>
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th class="header">Disk IOPS ${io} (/second)</th>
-                <th class="header">Minimum</th>
-                <th class="header">Average</th>
-                <th class="header">Maximum</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>read</td>
-                <td class="number">$value{"IO_${io}"}->{'R_MIN'}</td>
-                <td class="number">$value{"IO_${io}"}->{'R_AVG'}</td>
-                <td class="number">$value{"IO_${io}"}->{'R_MAX'}</td>
-              </tr>
-              <tr>
-                <td>write</td>
-                <td class="number">$value{"IO_${io}"}->{'W_MIN'}</td>
-                <td class="number">$value{"IO_${io}"}->{'W_AVG'}</td>
-                <td class="number">$value{"IO_${io}"}->{'W_MAX'}</td>
-              </tr>
-            </tbody>
-          </table>
-_EOF_
-        }
     }
     
     if (defined($index_load)) {
