@@ -1362,9 +1362,6 @@ sub create_graph {
             push @options, $io_limit;
         }
         
-        push @options, '--base';
-        push @options, 1024;
-        
         push @options, '--title';
         push @options, 'Disk IOPS total (/second)';
         
@@ -1410,9 +1407,6 @@ sub create_graph {
             push @options, $io_limit;
         }
         
-        push @options, '--base';
-        push @options, 1024;
-        
         push @options, '--title';
         push @options, 'Disk IOPS total read (/second)';
         
@@ -1436,9 +1430,6 @@ sub create_graph {
             push @options, '--upper-limit';
             push @options, $io_limit;
         }
-        
-        push @options, '--base';
-        push @options, 1024;
         
         push @options, '--title';
         push @options, 'Disk IOPS total write (/second)';
@@ -1464,9 +1455,6 @@ sub create_graph {
                 push @options, '--upper-limit';
                 push @options, $io_limit;
             }
-            
-            push @options, '--base';
-            push @options, 1024;
             
             push @options, '--title';
             push @options, "Disk IOPS ${io} (/second)";
@@ -1513,9 +1501,6 @@ sub create_graph {
                 push @options, $io_limit;
             }
             
-            push @options, '--base';
-            push @options, 1024;
-            
             push @options, '--title';
             push @options, "Disk IOPS ${io} read (/second)";
             
@@ -1539,9 +1524,6 @@ sub create_graph {
                 push @options, '--upper-limit';
                 push @options, $io_limit;
             }
-            
-            push @options, '--base';
-            push @options, 1024;
             
             push @options, '--title';
             push @options, "Disk IOPS ${io} write (/second)";
