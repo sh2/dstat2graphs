@@ -1735,7 +1735,7 @@ _EOF_
               <li>Duration: ${report_duration} (Seconds)</li>
             </ul>
           </div>
-          <p><a href="d_${report_suffix}.zip">Download a Zip file</a></p>
+          <p><a href="d_${report_suffix}.zip">Download ZIP</a></p>
           <h2>Processes</h2>
           <h3 id="procs_rb">Processes running, blocked</h3>
           <p><img src="procs_rb.png" alt="Processes running, blocked" /></p>
