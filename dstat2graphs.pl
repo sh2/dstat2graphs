@@ -62,7 +62,7 @@ my ($start_time, $end_time, $memory_size) = (0, 0, 0);
 
 sub load_csv {
     my $csv_start_time = 0;
-    open(my $fh, '<', "${csv_file}") or die $!;
+    open(my $fh, '<', $csv_file) or die $!;
     
     while (my $line = <$fh>) {
         chomp($line);
