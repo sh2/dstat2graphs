@@ -13,7 +13,7 @@ dstatのCSVファイルをもとにグラフを描画するWebアプリケーシ
 
 出力結果のサンプルです。
 
-- [k02c5 2012/05/04 20:03:53 - dstat2graphs](http://dbstudy.info/dstat2graphs/reports/20140309-132019_rbntbQci/)
+- [k01sl6.local 2017/01/29 17:54:14 - dstat2graphs](http://dbstudy.info/dstat2graphs/reports/20170129-190238_KRmlSfIV/)
 
 デモサイトの使用に際しては、次の点に注意してください。
 

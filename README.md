@@ -13,7 +13,7 @@ You can use the demo site below.
 
 Here is a sample output.
 
-- [k02c5 2012/05/04 20:03:53 - dstat2graphs](http://dbstudy.info/dstat2graphs/reports/20140309-132019_rbntbQci/)
+- [k01sl6.local 2017/01/29 17:54:14 - dstat2graphs](http://dbstudy.info/dstat2graphs/reports/20170129-190238_KRmlSfIV/)
 
 When you use the demo site, please be aware of the following.
 
