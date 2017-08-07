@@ -9,11 +9,11 @@ This is a web application which draws graphs from a dstat CSV file. It accepts f
 
 You can use the demo site below.
 
-- [dstat2graphs - dbstudy.info](http://dbstudy.info/dstat2graphs/)
+- [dstat2graphs - dbstudy.info](https://dbstudy.info/dstat2graphs/)
 
 Here is a sample output.
 
-- [k01sl6.local 2017/01/29 17:54:14 - dstat2graphs](http://dbstudy.info/dstat2graphs/reports/20170129-190238_KRmlSfIV/)
+- [k01sl6.local 2017/01/29 17:54:14 - dstat2graphs](https://dbstudy.info/dstat2graphs/reports/20170129-190238_KRmlSfIV/)
 
 When you use the demo site, please be aware of the following.
 

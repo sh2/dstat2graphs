@@ -9,11 +9,11 @@ dstatのCSVファイルをもとにグラフを描画するWebアプリケーシ
 
 以下のデモサイトで実際に使用できます。
 
-- [dstat2graphs - dbstudy.info](http://dbstudy.info/dstat2graphs/)
+- [dstat2graphs - dbstudy.info](https://dbstudy.info/dstat2graphs/)
 
 出力結果のサンプルです。
 
-- [k01sl6.local 2017/01/29 17:54:14 - dstat2graphs](http://dbstudy.info/dstat2graphs/reports/20170129-190238_KRmlSfIV/)
+- [k01sl6.local 2017/01/29 17:54:14 - dstat2graphs](https://dbstudy.info/dstat2graphs/reports/20170129-190238_KRmlSfIV/)
 
 デモサイトの使用に際しては、次の点に注意してください。
 
