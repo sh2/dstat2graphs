@@ -73,7 +73,7 @@ sub load_csv {
             # Header
             my @cols = parse_line(',', 0, $line);
             
-            if ($cols[0] =~ /^Dstat/) {
+            if ($cols[0] =~ /^(Dstat|pcp-dstat)/) {
                 # Title
             } elsif ($cols[0] eq 'Author:') {
                 # Author, URL
