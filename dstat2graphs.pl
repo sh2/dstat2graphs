@@ -361,6 +361,10 @@ sub update_rrd {
     foreach my $row (@data) {
         my $entry = '';
         my @cols = parse_line(',', 0, $row);
+
+        foreach my $col (@cols) {
+          $col =~ s//0/;
+        }
         
         if ($is_actual) {
             $entry .= &get_unixtime($year, $cols[0]);
