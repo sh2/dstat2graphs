@@ -5,6 +5,7 @@ use warnings;
 
 use Archive::Zip qw/AZ_OK/;
 use File::Path;
+use File::Temp qw/tempdir/;
 use HTML::Entities;
 use POSIX qw/floor ceil/;
 use RRDs;
@@ -46,7 +47,7 @@ my @colors = (
 my $epoch = 978274800; # 2001/01/01 00:00:00
 my $resolution = 3600;
 my $top_dir = '../..';
-my $rrd_file = '/dev/shm/dstat2graphs/' . &random_str() . '.rrd';
+my $rrd_file = tempdir(CLEANUP => 1) . '/dstat.rrd';
 
 my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net, %index_io, $index_load, %value);
 my ($start_time, $end_time, $memory_size) = (0, 0, 0);
@@ -2216,18 +2217,6 @@ sub create_zip {
     if ($zip->writeToFileNamed("${report_dir}/d_${report_suffix}.zip") != AZ_OK) {
         die;
     }
-}
-
-sub random_str {
-    my $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    my $length = length($chars);
-    my $str = '';
-    
-    for (my $i = 0; $i < 16; $i++) {
-        $str .= substr($chars, int(rand($length)), 1);
-    }
-    
-    return $str;
 }
 
 sub get_unixtime {
