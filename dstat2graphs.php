@@ -7,7 +7,7 @@ function get_report_dir() {
     $report_dir = 'reports/' . date('Ymd-His_');
     
     for ($i = 0; $i < 8; $i++) {
-        $report_dir .= $chars{mt_rand(0, strlen($chars) - 1)};
+        $report_dir .= $chars[mt_rand(0, strlen($chars) - 1)];
     }
     
     return $report_dir;
