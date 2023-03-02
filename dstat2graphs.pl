@@ -96,9 +96,8 @@ sub load_csv {
                     
                     if (!defined($col)) {
                         # Empty
-                    } elsif (($col =~ /^dsk\/(\w+[a-z])$/)
-                             or ($col =~ /^dsk\/cciss\/(c\d+d\d+)$/)) {
-                        # Disk
+                    } elsif ($col =~ /^dsk\/([\w\/]+)$/) {
+                        # Disk (HP Smart Array controllers have device names such as 'cciss/c0d0')
                         my $disk = $1;
                         $disk =~ tr/\//_/;
                         $index_disk{$disk} = $index;
@@ -110,8 +109,7 @@ sub load_csv {
                         my $net = $1;
                         $net =~ tr/\//_/;
                         $index_net{$net} = $index;
-                    } elsif (($col =~ /^io\/(\w+[a-z])$/)
-                             or ($col =~ /^io\/cciss\/(c\d+d\d+)$/)) {
+                    } elsif ($col =~ /^io\/([\w\/]+)$/) {
                         # Disk IOPS
                         my $io = $1;
                         $io =~ tr/\//_/;
