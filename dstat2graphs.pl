@@ -50,7 +50,7 @@ my $top_dir = '../..';
 my $rrd_file = tempdir(CLEANUP => 1) . '/dstat.rrd';
 
 my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net, %index_io, $index_load, %value);
-my ($start_time, $end_time, $memory_size) = (0, 0, 0);
+my ($start_time, $end_time, $memory_size, $io_total_only) = (0, 0, 0, 0);
 
 &load_csv();
 &create_rrd();
@@ -114,6 +114,10 @@ sub load_csv {
                         my $io = $1;
                         $io =~ tr/\//_/;
                         $index_io{$io} = $index;
+
+                        if ($io eq 'total') {
+                          $io_total_only = 1;
+                        }
                     } elsif ($col eq 'load avg') {
                         $index_load = $index;
                     }
@@ -1671,9 +1675,11 @@ _EOF_
               <li><a href="#io">Disk IOPS total</a></li>
 _EOF_
         
-        foreach my $io (sort keys %index_io) {
-            print $fh ' ' x 14;
-            print $fh "<li><a href=\"#io_${io}\">Disk IOPS ${io}</a></li>\n";
+        if (!$io_total_only) {
+          foreach my $io (sort keys %index_io) {
+              print $fh ' ' x 14;
+              print $fh "<li><a href=\"#io_${io}\">Disk IOPS ${io}</a></li>\n";
+          }
         }
     }
     
@@ -1925,8 +1931,9 @@ _EOF_
           </table>
 _EOF_
         
-        foreach my $io (sort keys %index_io) {
-            print $fh <<_EOF_;
+        if (!$io_total_only) {
+          foreach my $io (sort keys %index_io) {
+              print $fh <<_EOF_;
           <h3 id="io_${io}">Disk IOPS ${io}</h3>
           <p><img src="io_${io}_rw.png" alt="Disk IOPS ${io}"></p>
           <p><img src="io_${io}_r.png" alt="Disk IOPS ${io} read"></p>
@@ -1956,6 +1963,7 @@ _EOF_
             </tbody>
           </table>
 _EOF_
+          }
         }
     }
     
