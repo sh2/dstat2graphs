@@ -2,18 +2,20 @@
 
 // error_reporting(E_ALL|E_STRICT);
 
-function get_report_dir() {
+function get_report_dir()
+{
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $report_dir = 'reports/' . date('Ymd-His_');
-    
+
     for ($i = 0; $i < 8; $i++) {
         $report_dir .= $chars[mt_rand(0, strlen($chars) - 1)];
     }
-    
+
     return $report_dir;
 }
 
-function validate_number($input, $min, $max, $default) {
+function validate_number($input, $min, $max, $default)
+{
     if (preg_match('/^\d+$/D', $input)) {
         if ($input < $min) {
             return $min;
@@ -40,9 +42,12 @@ $is_actual  = validate_number($_POST['is_actual'], 0, 1, 0);
 $message    = '';
 
 if (is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
-    exec("perl dstat2graphs.pl {$csv_file} {$report_dir} {$width} {$height} {$disk_limit} {$net_limit} {$offset} {$duration} {$io_limit} {$is_actual} 2>&1",
-        $output, $return_var);
-    
+    exec(
+        "perl dstat2graphs.pl {$csv_file} {$report_dir} {$width} {$height} {$disk_limit} {$net_limit} {$offset} {$duration} {$io_limit} {$is_actual} 2>&1",
+        $output,
+        $return_var
+    );
+
     if ($return_var == 0) {
         header("Location: {$report_dir}/");
         exit();
@@ -53,8 +58,9 @@ if (is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
     }
 } else {
     if (($_FILES['csv_file']['error'] == UPLOAD_ERR_INI_SIZE)
-        || ($_FILES['csv_file']['error'] == UPLOAD_ERR_FORM_SIZE)) {
-        
+        || ($_FILES['csv_file']['error'] == UPLOAD_ERR_FORM_SIZE)
+    ) {
+
         $message = "File size limit exceeded.\n";
     } else {
         $message = "Failed to upload file.\n";
@@ -64,13 +70,15 @@ if (is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
 ?>
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Error - dstat2graphs</title>
-  </head>
-  <body>
-    <p>
-<?php echo $message; ?>
-    </p>
-  </body>
-</html>
 
+<head>
+    <title>Error - dstat2graphs</title>
+</head>
+
+<body>
+    <p>
+        <?php echo $message; ?>
+    </p>
+</body>
+
+</html>
