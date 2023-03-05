@@ -50,7 +50,7 @@ my $top_dir = '../..';
 my $rrd_file = tempdir(CLEANUP => 1) . '/dstat.rrd';
 
 my ($hostname, $year, @data, %index_disk, %index_cpu, %index_net, %index_io, $index_load, %value);
-my ($start_time, $end_time, $memory_size, $io_total_only) = (0, 0, 0, 0);
+my ($start_time, $end_time, $memory_size, $is_pcp, $io_total_only) = (0, 0, 0, 0, 0);
 
 &load_csv();
 &create_rrd();
@@ -76,6 +76,9 @@ sub load_csv {
             
             if ($cols[0] =~ /^(Dstat|pcp-dstat)/) {
                 # Title
+                if ($1 eq 'pcp-dstat') {
+                  $is_pcp = 1;
+                }
             } elsif ($cols[0] eq 'Author:') {
                 # Author, URL
             } elsif ($cols[0] eq 'Host:') {
@@ -378,7 +381,11 @@ sub update_rrd {
         $entry .= ":${cols[1]}:${cols[2]}:${cols[3]}";
         
         # Memory
-        $entry .= ":${cols[4]}:${cols[5]}:${cols[6]}";
+        if ($is_pcp) {
+          $entry .= ":${cols[4]}:${cols[6]}:${cols[7]}";
+        } else {
+          $entry .= ":${cols[4]}:${cols[5]}:${cols[6]}";
+        }
         
         # Paging
         $entry .= ":${cols[8]}:${cols[9]}";
