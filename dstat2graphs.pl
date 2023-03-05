@@ -273,38 +273,68 @@ sub create_rrd {
     push @options, "DS:CSWITCHES:GAUGE:${heartbeat}:U:U";
     push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
     
-    # CPU total
-    push @options, "DS:CPU_USR:GAUGE:${heartbeat}:U:U";
-    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
-    
-    push @options, "DS:CPU_SYS:GAUGE:${heartbeat}:U:U";
-    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
-    
-    push @options, "DS:CPU_HIQ:GAUGE:${heartbeat}:U:U";
-    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
-    
-    push @options, "DS:CPU_SIQ:GAUGE:${heartbeat}:U:U";
-    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
-    
-    push @options, "DS:CPU_WAI:GAUGE:${heartbeat}:U:U";
-    push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
-    
-    # CPU individual
-    foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
-        push @options, "DS:CPU${cpu}_USR:GAUGE:${heartbeat}:U:U";
+    if ($is_pcp) {
+        # CPU total
+        push @options, "DS:CPU_USR:GAUGE:${heartbeat}:U:U";
         push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
-        push @options, "DS:CPU${cpu}_SYS:GAUGE:${heartbeat}:U:U";
+        push @options, "DS:CPU_SYS:GAUGE:${heartbeat}:U:U";
         push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
-        push @options, "DS:CPU${cpu}_HIQ:GAUGE:${heartbeat}:U:U";
+        push @options, "DS:CPU_WAI:GAUGE:${heartbeat}:U:U";
         push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
-        push @options, "DS:CPU${cpu}_SIQ:GAUGE:${heartbeat}:U:U";
+        push @options, "DS:CPU_STL:GAUGE:${heartbeat}:U:U";
         push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
         
-        push @options, "DS:CPU${cpu}_WAI:GAUGE:${heartbeat}:U:U";
+        # CPU individual
+        foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
+            push @options, "DS:CPU${cpu}_USR:GAUGE:${heartbeat}:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+            
+            push @options, "DS:CPU${cpu}_SYS:GAUGE:${heartbeat}:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+            
+            push @options, "DS:CPU${cpu}_WAI:GAUGE:${heartbeat}:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+
+            push @options, "DS:CPU${cpu}_STL:GAUGE:${heartbeat}:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        }
+    } else {
+        # CPU total
+        push @options, "DS:CPU_USR:GAUGE:${heartbeat}:U:U";
         push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        
+        push @options, "DS:CPU_SYS:GAUGE:${heartbeat}:U:U";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        
+        push @options, "DS:CPU_HIQ:GAUGE:${heartbeat}:U:U";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        
+        push @options, "DS:CPU_SIQ:GAUGE:${heartbeat}:U:U";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        
+        push @options, "DS:CPU_WAI:GAUGE:${heartbeat}:U:U";
+        push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        
+        # CPU individual
+        foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
+            push @options, "DS:CPU${cpu}_USR:GAUGE:${heartbeat}:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+            
+            push @options, "DS:CPU${cpu}_SYS:GAUGE:${heartbeat}:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+            
+            push @options, "DS:CPU${cpu}_HIQ:GAUGE:${heartbeat}:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+            
+            push @options, "DS:CPU${cpu}_SIQ:GAUGE:${heartbeat}:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+            
+            push @options, "DS:CPU${cpu}_WAI:GAUGE:${heartbeat}:U:U";
+            push @options, "RRA:AVERAGE:0.5:${steps}:${rows}";
+        }
     }
     
     # Network total
@@ -414,33 +444,61 @@ sub update_rrd {
         # Context Switches
         $entry .= ":${cols[${index_cpu{'0'}} - 1]}";
         
-        # CPU total
-        my ($cpu_usr, $cpu_sys, $cpu_hiq, $cpu_siq, $cpu_wai) = (0, 0, 0, 0, 0);
-        
-        foreach my $cpu (keys %index_cpu) {
-            $cpu_usr += $cols[$index_cpu{$cpu}];
-            $cpu_sys += $cols[$index_cpu{$cpu} + 1];
-            $cpu_hiq += $cols[$index_cpu{$cpu} + 4];
-            $cpu_siq += $cols[$index_cpu{$cpu} + 5];
-            $cpu_wai += $cols[$index_cpu{$cpu} + 3];
-        }
-        
-        $cpu_usr /= scalar(keys %index_cpu);
-        $cpu_sys /= scalar(keys %index_cpu);
-        $cpu_hiq /= scalar(keys %index_cpu);
-        $cpu_siq /= scalar(keys %index_cpu);
-        $cpu_wai /= scalar(keys %index_cpu);
-        
-        $entry .= ":${cpu_usr}:${cpu_sys}:${cpu_hiq}:${cpu_siq}:${cpu_wai}";
-        
-        # CPU individual
-        foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
-            $cpu_usr = $cols[$index_cpu{$cpu}];
-            $cpu_sys = $cols[$index_cpu{$cpu} + 1];
-            $cpu_hiq = $cols[$index_cpu{$cpu} + 4];
-            $cpu_siq = $cols[$index_cpu{$cpu} + 5];
-            $cpu_wai = $cols[$index_cpu{$cpu} + 3];
+        if ($is_pcp) {
+            # CPU total
+            my ($cpu_usr, $cpu_sys, $cpu_wai, $cpu_stl) = (0, 0, 0, 0, 0, 0);
+            
+            foreach my $cpu (keys %index_cpu) {
+                $cpu_usr += $cols[$index_cpu{$cpu}];
+                $cpu_sys += $cols[$index_cpu{$cpu} + 1];
+                $cpu_wai += $cols[$index_cpu{$cpu} + 3];
+                $cpu_stl += $cols[$index_cpu{$cpu} + 4];
+            }
+            
+            $cpu_usr /= scalar(keys %index_cpu);
+            $cpu_sys /= scalar(keys %index_cpu);
+            $cpu_wai /= scalar(keys %index_cpu);
+            $cpu_stl /= scalar(keys %index_cpu);
+            
+            $entry .= ":${cpu_usr}:${cpu_sys}:${cpu_wai}:${cpu_stl}";
+            
+            # CPU individual
+            foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
+                $cpu_usr = $cols[$index_cpu{$cpu}];
+                $cpu_sys = $cols[$index_cpu{$cpu} + 1];
+                $cpu_wai = $cols[$index_cpu{$cpu} + 3];
+                $cpu_stl = $cols[$index_cpu{$cpu} + 4];
+                $entry .= ":${cpu_usr}:${cpu_sys}:${cpu_wai}:${cpu_stl}";
+            }
+        } else {
+            # CPU total
+            my ($cpu_usr, $cpu_sys, $cpu_hiq, $cpu_siq, $cpu_wai) = (0, 0, 0, 0, 0);
+            
+            foreach my $cpu (keys %index_cpu) {
+                $cpu_usr += $cols[$index_cpu{$cpu}];
+                $cpu_sys += $cols[$index_cpu{$cpu} + 1];
+                $cpu_hiq += $cols[$index_cpu{$cpu} + 4];
+                $cpu_siq += $cols[$index_cpu{$cpu} + 5];
+                $cpu_wai += $cols[$index_cpu{$cpu} + 3];
+            }
+            
+            $cpu_usr /= scalar(keys %index_cpu);
+            $cpu_sys /= scalar(keys %index_cpu);
+            $cpu_hiq /= scalar(keys %index_cpu);
+            $cpu_siq /= scalar(keys %index_cpu);
+            $cpu_wai /= scalar(keys %index_cpu);
+            
             $entry .= ":${cpu_usr}:${cpu_sys}:${cpu_hiq}:${cpu_siq}:${cpu_wai}";
+            
+            # CPU individual
+            foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
+                $cpu_usr = $cols[$index_cpu{$cpu}];
+                $cpu_sys = $cols[$index_cpu{$cpu} + 1];
+                $cpu_hiq = $cols[$index_cpu{$cpu} + 4];
+                $cpu_siq = $cols[$index_cpu{$cpu} + 5];
+                $cpu_wai = $cols[$index_cpu{$cpu} + 3];
+                $entry .= ":${cpu_usr}:${cpu_sys}:${cpu_hiq}:${cpu_siq}:${cpu_wai}";
+            }
         }
         
         # Network total
@@ -1009,104 +1067,175 @@ sub create_graph {
     $value{'CSWITCHES'}->{'AVG'} = $values[0]->[1];
     $value{'CSWITCHES'}->{'MAX'} = $values[0]->[2];
     
-    # CPU total
-    @options = @template;
-    
-    push @options, '--upper-limit';
-    push @options, 100;
-    
-    push @options, '--title';
-    push @options, 'CPU Usage total (%)';
-    
-    push @options, "DEF:USR=${rrd_file}:CPU_USR:AVERAGE";
-    push @options, "AREA:USR#${colors[0]}:user";
-    
-    push @options, "DEF:SYS=${rrd_file}:CPU_SYS:AVERAGE";
-    push @options, "STACK:SYS#${colors[1]}:system";
-    
-    push @options, "DEF:HIQ=${rrd_file}:CPU_HIQ:AVERAGE";
-    push @options, "STACK:HIQ#${colors[2]}:hardirq";
-    
-    push @options, "DEF:SIQ=${rrd_file}:CPU_SIQ:AVERAGE";
-    push @options, "STACK:SIQ#${colors[3]}:softirq";
-    
-    push @options, "DEF:WAI=${rrd_file}:CPU_WAI:AVERAGE";
-    push @options, "STACK:WAI#${colors[4]}:wait";
-    
-    push @options, "VDEF:U_MIN=USR,MINIMUM";
-    push @options, "PRINT:U_MIN:%4.2lf";
-    push @options, "VDEF:U_AVG=USR,AVERAGE";
-    push @options, "PRINT:U_AVG:%4.2lf";
-    push @options, "VDEF:U_MAX=USR,MAXIMUM";
-    push @options, "PRINT:U_MAX:%4.2lf";
-    
-    push @options, "CDEF:US=USR,SYS,+";
-    push @options, "VDEF:US_MIN=US,MINIMUM";
-    push @options, "PRINT:US_MIN:%4.2lf";
-    push @options, "VDEF:US_AVG=US,AVERAGE";
-    push @options, "PRINT:US_AVG:%4.2lf";
-    push @options, "VDEF:US_MAX=US,MAXIMUM";
-    push @options, "PRINT:US_MAX:%4.2lf";
-    
-    push @options, "CDEF:USHS=USR,SYS,+,HIQ,+,SIQ,+";
-    push @options, "VDEF:USHS_MIN=USHS,MINIMUM";
-    push @options, "PRINT:USHS_MIN:%4.2lf";
-    push @options, "VDEF:USHS_AVG=USHS,AVERAGE";
-    push @options, "PRINT:USHS_AVG:%4.2lf";
-    push @options, "VDEF:USHS_MAX=USHS,MAXIMUM";
-    push @options, "PRINT:USHS_MAX:%4.2lf";
-    
-    push @options, "CDEF:USHSW=USR,SYS,+,HIQ,+,SIQ,+,WAI,+";
-    push @options, "VDEF:USHSW_MIN=USHSW,MINIMUM";
-    push @options, "PRINT:USHSW_MIN:%4.2lf";
-    push @options, "VDEF:USHSW_AVG=USHSW,AVERAGE";
-    push @options, "PRINT:USHSW_AVG:%4.2lf";
-    push @options, "VDEF:USHSW_MAX=USHSW,MAXIMUM";
-    push @options, "PRINT:USHSW_MAX:%4.2lf";
-    
-    @values = RRDs::graph("${report_dir}/cpu.png", @options);
-    
-    if (my $error = RRDs::error) {
-        &delete_rrd();
-        die $error;
-    }
-    
-    $value{'CPU'}->{'U_MIN'} = $values[0]->[0];
-    $value{'CPU'}->{'U_AVG'} = $values[0]->[1];
-    $value{'CPU'}->{'U_MAX'} = $values[0]->[2];
-    $value{'CPU'}->{'US_MIN'} = $values[0]->[3];
-    $value{'CPU'}->{'US_AVG'} = $values[0]->[4];
-    $value{'CPU'}->{'US_MAX'} = $values[0]->[5];
-    $value{'CPU'}->{'USHS_MIN'} = $values[0]->[6];
-    $value{'CPU'}->{'USHS_AVG'} = $values[0]->[7];
-    $value{'CPU'}->{'USHS_MAX'} = $values[0]->[8];
-    $value{'CPU'}->{'USHSW_MIN'} = $values[0]->[9];
-    $value{'CPU'}->{'USHSW_AVG'} = $values[0]->[10];
-    $value{'CPU'}->{'USHSW_MAX'} = $values[0]->[11];
-    
-    # CPU individual
-    foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
+    if ($is_pcp) {
+        # CPU total
         @options = @template;
         
         push @options, '--upper-limit';
         push @options, 100;
         
         push @options, '--title';
-        push @options, "CPU Usage cpu${cpu} (%)";
+        push @options, 'CPU Usage total (%)';
         
-        push @options, "DEF:USR=${rrd_file}:CPU${cpu}_USR:AVERAGE";
+        push @options, "DEF:USR=${rrd_file}:CPU_USR:AVERAGE";
         push @options, "AREA:USR#${colors[0]}:user";
         
-        push @options, "DEF:SYS=${rrd_file}:CPU${cpu}_SYS:AVERAGE";
+        push @options, "DEF:SYS=${rrd_file}:CPU_SYS:AVERAGE";
         push @options, "STACK:SYS#${colors[1]}:system";
         
-        push @options, "DEF:HIQ=${rrd_file}:CPU${cpu}_HIQ:AVERAGE";
+        push @options, "DEF:WAI=${rrd_file}:CPU_WAI:AVERAGE";
+        push @options, "STACK:WAI#${colors[2]}:wait";
+        
+        push @options, "DEF:STL=${rrd_file}:CPU_STL:AVERAGE";
+        push @options, "STACK:STL#${colors[3]}:steal";
+        
+        push @options, "VDEF:U_MIN=USR,MINIMUM";
+        push @options, "PRINT:U_MIN:%4.2lf";
+        push @options, "VDEF:U_AVG=USR,AVERAGE";
+        push @options, "PRINT:U_AVG:%4.2lf";
+        push @options, "VDEF:U_MAX=USR,MAXIMUM";
+        push @options, "PRINT:U_MAX:%4.2lf";
+        
+        push @options, "CDEF:US=USR,SYS,+";
+        push @options, "VDEF:US_MIN=US,MINIMUM";
+        push @options, "PRINT:US_MIN:%4.2lf";
+        push @options, "VDEF:US_AVG=US,AVERAGE";
+        push @options, "PRINT:US_AVG:%4.2lf";
+        push @options, "VDEF:US_MAX=US,MAXIMUM";
+        push @options, "PRINT:US_MAX:%4.2lf";
+
+        push @options, "CDEF:USW=USR,SYS,+,WAI,+";
+        push @options, "VDEF:USW_MIN=USW,MINIMUM";
+        push @options, "PRINT:USW_MIN:%4.2lf";
+        push @options, "VDEF:USW_AVG=USW,AVERAGE";
+        push @options, "PRINT:USW_AVG:%4.2lf";
+        push @options, "VDEF:USW_MAX=USW,MAXIMUM";
+        push @options, "PRINT:USW_MAX:%4.2lf";
+
+        push @options, "CDEF:USWS=USR,SYS,+,WAI,+,STL,+";
+        push @options, "VDEF:USWS_MIN=USWS,MINIMUM";
+        push @options, "PRINT:USWS_MIN:%4.2lf";
+        push @options, "VDEF:USWS_AVG=USWS,AVERAGE";
+        push @options, "PRINT:USWS_AVG:%4.2lf";
+        push @options, "VDEF:USWS_MAX=USWS,MAXIMUM";
+        push @options, "PRINT:USWS_MAX:%4.2lf";
+        
+        @values = RRDs::graph("${report_dir}/cpu.png", @options);
+        
+        if (my $error = RRDs::error) {
+            &delete_rrd();
+            die $error;
+        }
+        
+        $value{'CPU'}->{'U_MIN'} = $values[0]->[0];
+        $value{'CPU'}->{'U_AVG'} = $values[0]->[1];
+        $value{'CPU'}->{'U_MAX'} = $values[0]->[2];
+        $value{'CPU'}->{'US_MIN'} = $values[0]->[3];
+        $value{'CPU'}->{'US_AVG'} = $values[0]->[4];
+        $value{'CPU'}->{'US_MAX'} = $values[0]->[5];
+        $value{'CPU'}->{'USW_MIN'} = $values[0]->[6];
+        $value{'CPU'}->{'USW_AVG'} = $values[0]->[7];
+        $value{'CPU'}->{'USW_MAX'} = $values[0]->[8];
+        $value{'CPU'}->{'USWS_MIN'} = $values[0]->[9];
+        $value{'CPU'}->{'USWS_AVG'} = $values[0]->[10];
+        $value{'CPU'}->{'USWS_MAX'} = $values[0]->[11];
+        
+        # CPU individual
+        foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
+            @options = @template;
+            
+            push @options, '--upper-limit';
+            push @options, 100;
+            
+            push @options, '--title';
+            push @options, "CPU Usage cpu${cpu} (%)";
+            
+            push @options, "DEF:USR=${rrd_file}:CPU${cpu}_USR:AVERAGE";
+            push @options, "AREA:USR#${colors[0]}:user";
+            
+            push @options, "DEF:SYS=${rrd_file}:CPU${cpu}_SYS:AVERAGE";
+            push @options, "STACK:SYS#${colors[1]}:system";
+            
+            push @options, "DEF:WAI=${rrd_file}:CPU${cpu}_WAI:AVERAGE";
+            push @options, "STACK:WAI#${colors[2]}:wait";
+            
+            push @options, "DEF:STL=${rrd_file}:CPU${cpu}_STL:AVERAGE";
+            push @options, "STACK:STL#${colors[3]}:steal";
+            
+            push @options, "VDEF:U_MIN=USR,MINIMUM";
+            push @options, "PRINT:U_MIN:%4.2lf";
+            push @options, "VDEF:U_AVG=USR,AVERAGE";
+            push @options, "PRINT:U_AVG:%4.2lf";
+            push @options, "VDEF:U_MAX=USR,MAXIMUM";
+            push @options, "PRINT:U_MAX:%4.2lf";
+            
+            push @options, "CDEF:US=USR,SYS,+";
+            push @options, "VDEF:US_MIN=US,MINIMUM";
+            push @options, "PRINT:US_MIN:%4.2lf";
+            push @options, "VDEF:US_AVG=US,AVERAGE";
+            push @options, "PRINT:US_AVG:%4.2lf";
+            push @options, "VDEF:US_MAX=US,MAXIMUM";
+            push @options, "PRINT:US_MAX:%4.2lf";
+            
+            push @options, "CDEF:USW=USR,SYS,+,WAI,+";
+            push @options, "VDEF:USW_MIN=USW,MINIMUM";
+            push @options, "PRINT:USW_MIN:%4.2lf";
+            push @options, "VDEF:USW_AVG=USW,AVERAGE";
+            push @options, "PRINT:USW_AVG:%4.2lf";
+            push @options, "VDEF:USW_MAX=USW,MAXIMUM";
+            push @options, "PRINT:USW_MAX:%4.2lf";
+            
+            push @options, "CDEF:USWS=USR,SYS,+,WAI,+,STL,+";
+            push @options, "VDEF:USWS_MIN=USWS,MINIMUM";
+            push @options, "PRINT:USWS_MIN:%4.2lf";
+            push @options, "VDEF:USWS_AVG=USWS,AVERAGE";
+            push @options, "PRINT:USWS_AVG:%4.2lf";
+            push @options, "VDEF:USWS_MAX=USWS,MAXIMUM";
+            push @options, "PRINT:USWS_MAX:%4.2lf";
+            
+            @values = RRDs::graph("${report_dir}/cpu${cpu}.png", @options);
+            
+            if (my $error = RRDs::error) {
+                &delete_rrd();
+                die $error;
+            }
+            
+            $value{"CPU${cpu}"}->{'U_MIN'} = $values[0]->[0];
+            $value{"CPU${cpu}"}->{'U_AVG'} = $values[0]->[1];
+            $value{"CPU${cpu}"}->{'U_MAX'} = $values[0]->[2];
+            $value{"CPU${cpu}"}->{'US_MIN'} = $values[0]->[3];
+            $value{"CPU${cpu}"}->{'US_AVG'} = $values[0]->[4];
+            $value{"CPU${cpu}"}->{'US_MAX'} = $values[0]->[5];
+            $value{"CPU${cpu}"}->{'USW_MIN'} = $values[0]->[6];
+            $value{"CPU${cpu}"}->{'USW_AVG'} = $values[0]->[7];
+            $value{"CPU${cpu}"}->{'USW_MAX'} = $values[0]->[8];
+            $value{"CPU${cpu}"}->{'USWS_MIN'} = $values[0]->[9];
+            $value{"CPU${cpu}"}->{'USWS_AVG'} = $values[0]->[10];
+            $value{"CPU${cpu}"}->{'USWS_MAX'} = $values[0]->[11];
+        }
+    } else {
+        # CPU total
+        @options = @template;
+        
+        push @options, '--upper-limit';
+        push @options, 100;
+        
+        push @options, '--title';
+        push @options, 'CPU Usage total (%)';
+        
+        push @options, "DEF:USR=${rrd_file}:CPU_USR:AVERAGE";
+        push @options, "AREA:USR#${colors[0]}:user";
+        
+        push @options, "DEF:SYS=${rrd_file}:CPU_SYS:AVERAGE";
+        push @options, "STACK:SYS#${colors[1]}:system";
+        
+        push @options, "DEF:HIQ=${rrd_file}:CPU_HIQ:AVERAGE";
         push @options, "STACK:HIQ#${colors[2]}:hardirq";
         
-        push @options, "DEF:SIQ=${rrd_file}:CPU${cpu}_SIQ:AVERAGE";
+        push @options, "DEF:SIQ=${rrd_file}:CPU_SIQ:AVERAGE";
         push @options, "STACK:SIQ#${colors[3]}:softirq";
         
-        push @options, "DEF:WAI=${rrd_file}:CPU${cpu}_WAI:AVERAGE";
+        push @options, "DEF:WAI=${rrd_file}:CPU_WAI:AVERAGE";
         push @options, "STACK:WAI#${colors[4]}:wait";
         
         push @options, "VDEF:U_MIN=USR,MINIMUM";
@@ -1140,27 +1269,104 @@ sub create_graph {
         push @options, "VDEF:USHSW_MAX=USHSW,MAXIMUM";
         push @options, "PRINT:USHSW_MAX:%4.2lf";
         
-        @values = RRDs::graph("${report_dir}/cpu${cpu}.png", @options);
+        @values = RRDs::graph("${report_dir}/cpu.png", @options);
         
         if (my $error = RRDs::error) {
             &delete_rrd();
             die $error;
         }
         
-        $value{"CPU${cpu}"}->{'U_MIN'} = $values[0]->[0];
-        $value{"CPU${cpu}"}->{'U_AVG'} = $values[0]->[1];
-        $value{"CPU${cpu}"}->{'U_MAX'} = $values[0]->[2];
-        $value{"CPU${cpu}"}->{'US_MIN'} = $values[0]->[3];
-        $value{"CPU${cpu}"}->{'US_AVG'} = $values[0]->[4];
-        $value{"CPU${cpu}"}->{'US_MAX'} = $values[0]->[5];
-        $value{"CPU${cpu}"}->{'USHS_MIN'} = $values[0]->[6];
-        $value{"CPU${cpu}"}->{'USHS_AVG'} = $values[0]->[7];
-        $value{"CPU${cpu}"}->{'USHS_MAX'} = $values[0]->[8];
-        $value{"CPU${cpu}"}->{'USHSW_MIN'} = $values[0]->[9];
-        $value{"CPU${cpu}"}->{'USHSW_AVG'} = $values[0]->[10];
-        $value{"CPU${cpu}"}->{'USHSW_MAX'} = $values[0]->[11];
+        $value{'CPU'}->{'U_MIN'} = $values[0]->[0];
+        $value{'CPU'}->{'U_AVG'} = $values[0]->[1];
+        $value{'CPU'}->{'U_MAX'} = $values[0]->[2];
+        $value{'CPU'}->{'US_MIN'} = $values[0]->[3];
+        $value{'CPU'}->{'US_AVG'} = $values[0]->[4];
+        $value{'CPU'}->{'US_MAX'} = $values[0]->[5];
+        $value{'CPU'}->{'USHS_MIN'} = $values[0]->[6];
+        $value{'CPU'}->{'USHS_AVG'} = $values[0]->[7];
+        $value{'CPU'}->{'USHS_MAX'} = $values[0]->[8];
+        $value{'CPU'}->{'USHSW_MIN'} = $values[0]->[9];
+        $value{'CPU'}->{'USHSW_AVG'} = $values[0]->[10];
+        $value{'CPU'}->{'USHSW_MAX'} = $values[0]->[11];
+        
+        # CPU individual
+        foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
+            @options = @template;
+            
+            push @options, '--upper-limit';
+            push @options, 100;
+            
+            push @options, '--title';
+            push @options, "CPU Usage cpu${cpu} (%)";
+            
+            push @options, "DEF:USR=${rrd_file}:CPU${cpu}_USR:AVERAGE";
+            push @options, "AREA:USR#${colors[0]}:user";
+            
+            push @options, "DEF:SYS=${rrd_file}:CPU${cpu}_SYS:AVERAGE";
+            push @options, "STACK:SYS#${colors[1]}:system";
+            
+            push @options, "DEF:HIQ=${rrd_file}:CPU${cpu}_HIQ:AVERAGE";
+            push @options, "STACK:HIQ#${colors[2]}:hardirq";
+            
+            push @options, "DEF:SIQ=${rrd_file}:CPU${cpu}_SIQ:AVERAGE";
+            push @options, "STACK:SIQ#${colors[3]}:softirq";
+            
+            push @options, "DEF:WAI=${rrd_file}:CPU${cpu}_WAI:AVERAGE";
+            push @options, "STACK:WAI#${colors[4]}:wait";
+            
+            push @options, "VDEF:U_MIN=USR,MINIMUM";
+            push @options, "PRINT:U_MIN:%4.2lf";
+            push @options, "VDEF:U_AVG=USR,AVERAGE";
+            push @options, "PRINT:U_AVG:%4.2lf";
+            push @options, "VDEF:U_MAX=USR,MAXIMUM";
+            push @options, "PRINT:U_MAX:%4.2lf";
+            
+            push @options, "CDEF:US=USR,SYS,+";
+            push @options, "VDEF:US_MIN=US,MINIMUM";
+            push @options, "PRINT:US_MIN:%4.2lf";
+            push @options, "VDEF:US_AVG=US,AVERAGE";
+            push @options, "PRINT:US_AVG:%4.2lf";
+            push @options, "VDEF:US_MAX=US,MAXIMUM";
+            push @options, "PRINT:US_MAX:%4.2lf";
+            
+            push @options, "CDEF:USHS=USR,SYS,+,HIQ,+,SIQ,+";
+            push @options, "VDEF:USHS_MIN=USHS,MINIMUM";
+            push @options, "PRINT:USHS_MIN:%4.2lf";
+            push @options, "VDEF:USHS_AVG=USHS,AVERAGE";
+            push @options, "PRINT:USHS_AVG:%4.2lf";
+            push @options, "VDEF:USHS_MAX=USHS,MAXIMUM";
+            push @options, "PRINT:USHS_MAX:%4.2lf";
+            
+            push @options, "CDEF:USHSW=USR,SYS,+,HIQ,+,SIQ,+,WAI,+";
+            push @options, "VDEF:USHSW_MIN=USHSW,MINIMUM";
+            push @options, "PRINT:USHSW_MIN:%4.2lf";
+            push @options, "VDEF:USHSW_AVG=USHSW,AVERAGE";
+            push @options, "PRINT:USHSW_AVG:%4.2lf";
+            push @options, "VDEF:USHSW_MAX=USHSW,MAXIMUM";
+            push @options, "PRINT:USHSW_MAX:%4.2lf";
+            
+            @values = RRDs::graph("${report_dir}/cpu${cpu}.png", @options);
+            
+            if (my $error = RRDs::error) {
+                &delete_rrd();
+                die $error;
+            }
+            
+            $value{"CPU${cpu}"}->{'U_MIN'} = $values[0]->[0];
+            $value{"CPU${cpu}"}->{'U_AVG'} = $values[0]->[1];
+            $value{"CPU${cpu}"}->{'U_MAX'} = $values[0]->[2];
+            $value{"CPU${cpu}"}->{'US_MIN'} = $values[0]->[3];
+            $value{"CPU${cpu}"}->{'US_AVG'} = $values[0]->[4];
+            $value{"CPU${cpu}"}->{'US_MAX'} = $values[0]->[5];
+            $value{"CPU${cpu}"}->{'USHS_MIN'} = $values[0]->[6];
+            $value{"CPU${cpu}"}->{'USHS_AVG'} = $values[0]->[7];
+            $value{"CPU${cpu}"}->{'USHS_MAX'} = $values[0]->[8];
+            $value{"CPU${cpu}"}->{'USHSW_MIN'} = $values[0]->[9];
+            $value{"CPU${cpu}"}->{'USHSW_AVG'} = $values[0]->[10];
+            $value{"CPU${cpu}"}->{'USHSW_MAX'} = $values[0]->[11];
+        }
     }
-    
+
     # Network total
     @options = @template;
     
@@ -2017,6 +2223,96 @@ _EOF_
               </tr>
             </tbody>
           </table>
+_EOF_
+
+    if ($is_pcp) {
+        print $fh <<_EOF_;
+          <hr />
+          <h2>CPU Usage</h2>
+          <h3 id="cpu">CPU Usage total</h3>
+          <p><img src="cpu.png" alt="CPU Usage total" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">CPU Usage total (%)</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>user</td>
+                <td class="number">$value{'CPU'}->{'U_MIN'} %</td>
+                <td class="number">$value{'CPU'}->{'U_AVG'} %</td>
+                <td class="number">$value{'CPU'}->{'U_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system</td>
+                <td class="number">$value{'CPU'}->{'US_MIN'} %</td>
+                <td class="number">$value{'CPU'}->{'US_AVG'} %</td>
+                <td class="number">$value{'CPU'}->{'US_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system+wait</td>
+                <td class="number">$value{'CPU'}->{'USW_MIN'} %</td>
+                <td class="number">$value{'CPU'}->{'USW_AVG'} %</td>
+                <td class="number">$value{'CPU'}->{'USW_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system+wait+steal</td>
+                <td class="number">$value{'CPU'}->{'USWS_MIN'} %</td>
+                <td class="number">$value{'CPU'}->{'USWS_AVG'} %</td>
+                <td class="number">$value{'CPU'}->{'USWS_MAX'} %</td>
+              </tr>
+            </tbody>
+          </table>
+_EOF_
+    
+        foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
+            print $fh <<_EOF_;
+          <h3 id="cpu${cpu}">CPU Usage cpu${cpu}</h3>
+          <p><img src="cpu${cpu}.png" alt="CPU Usage cpu${cpu}" /></p>
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th class="header">CPU Usage cpu${cpu} (%)</th>
+                <th class="header">Minimum</th>
+                <th class="header">Average</th>
+                <th class="header">Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>user</td>
+                <td class="number">$value{"CPU${cpu}"}->{'U_MIN'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'U_AVG'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'U_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system</td>
+                <td class="number">$value{"CPU${cpu}"}->{'US_MIN'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'US_AVG'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'US_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system+wait</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USW_MIN'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USW_AVG'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USW_MAX'} %</td>
+              </tr>
+              <tr>
+                <td>user+system+wait+steal</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USWS_MIN'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USWS_AVG'} %</td>
+                <td class="number">$value{"CPU${cpu}"}->{'USWS_MAX'} %</td>
+              </tr>
+            </tbody>
+          </table>
+_EOF_
+        }
+    } else {
+        print $fh <<_EOF_;
           <hr />
           <h2>CPU Usage</h2>
           <h3 id="cpu">CPU Usage total</h3>
@@ -2059,8 +2355,8 @@ _EOF_
           </table>
 _EOF_
     
-    foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
-        print $fh <<_EOF_;
+        foreach my $cpu (sort { $a <=> $b } keys %index_cpu) {
+            print $fh <<_EOF_;
           <h3 id="cpu${cpu}">CPU Usage cpu${cpu}</h3>
           <p><img src="cpu${cpu}.png" alt="CPU Usage cpu${cpu}" /></p>
           <table class="table table-condensed">
@@ -2100,6 +2396,7 @@ _EOF_
             </tbody>
           </table>
 _EOF_
+        }
     }
     
     print $fh <<_EOF_;
