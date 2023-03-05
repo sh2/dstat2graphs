@@ -2578,7 +2578,7 @@ _EOF_
       <hr />
       <div class="footer">
         <a href="https://github.com/sh2/dstat2graphs">https://github.com/sh2/dstat2graphs</a><br />
-        (c) 2012-2017, Sadao Hiratsuka.
+        (c) 2012-2023 Sadao Hiratsuka.
       </div>
     </div>
     <script src="${top_dir}/js/jquery-1.12.4.min.js"></script>
