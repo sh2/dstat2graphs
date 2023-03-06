@@ -446,7 +446,9 @@ sub update_rrd {
         my @cols  = parse_line( ',', 0, $row );
 
         foreach my $col (@cols) {
-            $col =~ s//0/;
+            if ( defined($col) and ( $col eq '' ) ) {
+                $col = '0';
+            }
         }
 
         if ($is_actual) {
