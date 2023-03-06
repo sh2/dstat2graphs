@@ -42,7 +42,7 @@ my @colors = (
     '7F5F00', '0000BF', 'BF0000', '008F00'
 );
 
-my $epoch      = 978274800;                                # 2001/01/01 00:00:00
+my $epoch      = timelocal( 0, 0, 0, 1, 0, 2001 );
 my $resolution = 3600;
 my $top_dir    = '../..';
 my $rrd_file   = tempdir( CLEANUP => 1 ) . '/dstat.rrd';
