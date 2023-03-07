@@ -18,9 +18,54 @@ dstatのCSVファイルをもとにグラフを描画するWebアプリケーシ
 デモサイトの使用に際しては、次の点に注意してください。
 
 - アップロードできるCSVファイルサイズは、4MBytesまでです。
-- アクセス制御機能はありませんので、機密性の高いデータはアップロードしないでください。
+- アクセス制御はしていませんので、他者に見られて困るデータはアップロードしないでください。
 
 ## セットアップ
+
+### コンテナを利用する場合
+
+Podman/Buildahで動作を確認しています。まず`build.sh`を用いてコンテナイメージをビルドします。
+
+    $ ./build.sh
+
+コンテナイメージをビルドしたら、TCPの80番ポートを公開するようにしてコンテナを起動します。
+
+    $ podman run --detach --publish=8080:80 --name=dstat2graphs dstat2graphs:latest
+
+コンテナが起動したら、ウェブブラウザで http://localhost:8080/dstat2graphs/ を開いてください。
+
+### Rocky Linux 9に導入する場合
+
+最初に必要なパッケージをインストールします。
+
+    $ sudo dnf install httpd perl-Archive-Zip perl-HTML-Parser php rrdtool-perl
+
+Apache HTTP Serverを起動して、外部からアクセスできるようにファイアウォールのルールを追加します。
+
+    $ sudo systemctl enable httpd
+    $ sudo systemctl start httpd
+    $ sudo firewall-cmd --add-service=http --permanent
+    $ sudo firewall-cmd --reload
+
+アプリケーションのソースコードを取得して、必要なファイルをドキュメントルート配下にコピーします。
+
+    $ git clone https://github.com/sh2/dstat2graphs.git
+    $ sudo rsync -rp dstat2graphs/src/ /var/www/html/dstat2graphs
+
+アプリケーションが出力するレポートを格納するディレクトリを準備します。このディレクトリは`apache`ユーザーが書き込める必要があり、SELinuxが有効な場合は`httpd_sys_rw_content`タイプでラベル付けされている必要があります。
+
+    $ sudo mkdir /var/www/html/dstat2graphs/reports
+    $ sudo chown apache:apache /var/www/html/dstat2graphs/reports
+    $ sudo semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/dstat2graphs/reports(/.*)?'
+    $ sudo restorecon -R /var/www/html/dstat2graphs/reports
+
+ここまで設定できたら、ウェブブラウザで http://localhost/dstat2graphs/ を開いてください。
+
+### Ubuntu 22.04 LTSに導入する場合
+
+WIP
+
+### 以前の構築手順
 
 Red Hat Enterprise Linux 6/7と、それらのクローンディストリビューションを対象にしています。
 
