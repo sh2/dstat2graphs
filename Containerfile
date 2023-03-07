@@ -5,4 +5,5 @@ RUN apk update && \
     chown apache:apache /var/www/localhost/htdocs/dstat2graphs/reports
 COPY php_dstat.ini /etc/php81/conf.d/
 COPY src/ /var/www/localhost/htdocs/dstat2graphs/
+EXPOSE 80
 CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
