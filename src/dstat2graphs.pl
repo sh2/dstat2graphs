@@ -446,7 +446,7 @@ sub update_rrd {
         my @cols  = parse_line( ',', 0, $row );
 
         foreach my $col (@cols) {
-            if ( defined($col) and ( $col eq '' ) ) {
+            if ( !defined($col) or ( $col eq '' ) ) {
                 $col = '0';
             }
         }
