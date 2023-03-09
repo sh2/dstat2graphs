@@ -3,8 +3,8 @@
 This is a web application that draws graphs based on dstat CSV files.
 It accepts files output with the following options.
 
-    $ dstat -tfvn --output log.csv [delay]
-    $ dstat -tfvnrl --output log.csv [delay]
+    $ dstat -tfvn --output data.csv [delay]
+    $ dstat -tfvnrl --output data.csv [delay]
 
 ## Sample
 

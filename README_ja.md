@@ -3,8 +3,8 @@
 dstatのCSVファイルをもとにグラフを描画するウェブアプリケーションです。
 以下のオプションで出力されたファイルを受け付けます。
 
-    $ dstat -tfvn --output log.csv [delay]
-    $ dstat -tfvnrl --output log.csv [delay]
+    $ dstat -tfvn --output data.csv [delay]
+    $ dstat -tfvnrl --output data.csv [delay]
 
 ## サンプル
 
