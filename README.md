@@ -21,6 +21,8 @@ Therefore, please do not upload data that you do not want others to see.
 
 ## Setup Instructions
 
+### Using a container
+
 We have tested the operation with Podman/Buildah.
 First, build the container image using `build.sh`.
 
