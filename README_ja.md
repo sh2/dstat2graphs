@@ -106,6 +106,34 @@ perfork MPMが有効化されているUbuntu 22.04 LTSでは`apache2`サービ�
 
     $ sudo systemctl reload apache2
 
+## pcp-dstat使用時の注意点
+
+dstatにはDag Wieers氏が開発したオリジナル版のdstatと、Red Hat社が開発したpcp-dstatがあります。オリジナル版はPython 2で開発されており、pcp-dstatはPython 3で開発されています。
+
+dstat2graphsは両方のdstatに対応していますが、pcp-dstatは最近のバージョンまでCSV出力機能にいくつか不具合があり、dstat2graphsでCSVファイルを読み込むことができませんでした。不具合の概要とディストリビューションごとの状況を以下に示します。
+
+- 不具合1 … -f(--full)オプションが正常に動作しません。この不具合はpcp-dstat 5.2.1で修正されました。
+- 不具合2 … CSVファイルのヘッダが一部欠落します。この不具合はpcp-dstat 6.0.xで修正される見込みです。
+
+|ディストリビューション|dstatバージョン|CSV出力機能|
+|-|-|-|
+|CentOS 7|dstat 0.7.2|正常に動作します|
+|Rocky Linux 8|pcp-dstat 5.3.7|不具合2の影響を受けます|
+|Rocky Linux 9|pcp-dstat 5.3.7|不具合2の影響を受けます|
+|Ubuntu 18.04 LTS|dstat 0.7.3|正常に動作します|
+|Ubuntu 20.04 LTS|pcp-dstat 5.0.3|不具合1、2の影響を受けます|
+|Ubuntu 22.04 LTS|pcp-dstat 5.3.6|不具合2の影響を受けます|
+
+不具合の影響を受けるディストリビューションでは、GitHubから`pcp-dstat.py`の最新バージョンを取得して利用することをおすすめします。
+
+    $ curl -LO https://raw.githubusercontent.com/performancecopilot/pcp/main/src/pcp/dstat/pcp-dstat.py
+    $ chmod +x pcp-dstat.py
+
+不具合2については実行時の工夫で回避できます。
+以下のようにdstatの標準出力をリダイレクトすると、内部動作が変わってCSVファイルのヘッダが正常に出力されるようになります。
+
+    $ dstat -tfvnrl --output data.csv 1 > stdout.log
+
 ## Web UI
 
 ウェブブラウザでURLを開くと、CSVファイルをアップロードする画面が表示されます。

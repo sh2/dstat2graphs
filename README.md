@@ -106,6 +106,34 @@ On Ubuntu 22.04 LTS with perfork MPM enabled, reload the `apache2` service.
 
     $ sudo systemctl reload apache2
 
+## Notes on using pcp-dstat
+
+There are two versions of dstat: the original version developed by Dag Wieers and pcp-dstat developed by Red Hat. The original version is developed in Python 2, while pcp-dstat is developed in Python 3.
+
+Although dstat2graphs supports both dstats, pcp-dstat had some bugs in its CSV output function until the recent version, and it was not possible to read CSV files with dstat2graphs. A summary of the bugs and their status by distribution is given below.
+
+- Bug 1 ... The -f (--full) option does not work properly. This bug has been fixed in pcp-dstat 5.2.1.
+- Bug 2 ... Some headers of CSV files are missing. This bug is expected to be fixed in pcp-dstat 6.0.x.
+
+|distribution|dstat version|CSV output function|
+|-|-|-|
+|CentOS 7|dstat 0.7.2|works fine|
+|Rocky Linux 8|pcp-dstat 5.3.7|affected by bug 2|
+|Rocky Linux 9|pcp-dstat 5.3.7|affected by bug 2
+|Ubuntu 18.04 LTS|dstat 0.7.3|works fine|
+|Ubuntu 20.04 LTS|pcp-dstat 5.0.3|affected by bug 1 and 2|
+|Ubuntu 22.04 LTS|pcp-dstat 5.3.6|affected by bug 2|
+
+For distributions affected by the bugs, it is recommended to obtain the latest version of `pcp-dstat.py` from GitHub and use it.
+
+    $ curl -LO https://raw.githubusercontent.com/performancecopilot/pcp/main/src/pcp/dstat/pcp-dstat.py
+    $ chmod +x pcp-dstat.py
+
+Bug 2 can be worked around by a runtime tweak.
+Redirecting the standard output of dstat as follows will change the internal behavior so that the headers of the CSV file are output properly.
+
+    $ dstat -tfvnrl --output data.csv 1 > stdout.log
+
 ## Web UI
 
 Open the URL in a web browser, and a screen for uploading a CSV file will appear.
