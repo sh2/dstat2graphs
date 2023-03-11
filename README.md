@@ -14,7 +14,7 @@ You can actually use the following demo site.
 
 Here is a sample of the output results.
 
-- [k01sl6.local 2017/01/29 17:54:14 - dstat2graphs](https://dbstudy.info/dstat2graphs/reports/20170129-190238_KRmlSfIV/)
+- [k01sl6.local 2017/01/29 17:54:14 - dstat2graphs](https://dbstudy.info/sample/reports/20230312-002928_HTurMGXN/)
 
 Data uploaded to the demo site can be viewed by anyone.
 Therefore, please do not upload data that you do not want others to see.

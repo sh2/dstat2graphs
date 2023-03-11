@@ -14,7 +14,7 @@ dstatのCSVファイルをもとにグラフを描画するウェブアプリケ
 
 出力結果のサンプルです。
 
-- [k01sl6.local 2017/01/29 17:54:14 - dstat2graphs](https://dbstudy.info/dstat2graphs/reports/20170129-190238_KRmlSfIV/)
+- [k01sl6.local 2017/01/29 17:54:14 - dstat2graphs](https://dbstudy.info/sample/reports/20230312-002928_HTurMGXN/)
 
 デモサイトにアップロードされたデータは誰でも閲覧できます。
 そのため他者に見られて困るデータはアップロードしないでください。
